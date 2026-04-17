@@ -16,16 +16,19 @@ const CH = {
   b2b: { label: "B2B 400g", g: 400, nsv: 55, cogs: 45, price: 75 },
 };
 const STORES = [
-  { id: "B01", name: "ICA Maxi Mölndal", fmt: "Maxi", chain: "ICA", group: "A" },
-  { id: "B02", name: "ICA Maxi Högsbo", fmt: "Maxi", chain: "ICA", group: "A" },
-  { id: "B03", name: "ICA Focus", fmt: "Kvantum", chain: "ICA", group: "B" },
-  { id: "B04", name: "ICA Hovås", fmt: "Kvantum", chain: "ICA", group: "B" },
-  { id: "B05", name: "ICA Kvantum Mölndal", fmt: "Kvantum", chain: "ICA", group: "A" },
-  { id: "B06", name: "ICA Åkeredshallen", fmt: "Supermarket", chain: "ICA", group: "C" },
-  { id: "B07", name: "ICA Nära Linné", fmt: "Nära", chain: "ICA", group: "C" },
-  { id: "B08", name: "ICA Hajen Varberg", fmt: "Supermarket", chain: "ICA", group: "B" },
-  { id: "B09", name: "ICA Kvantum Varberg", fmt: "Kvantum", chain: "ICA", group: "C" },
-  { id: "B10", name: "Hemköp Vasagatan", fmt: "Hemköp", chain: "Axfood", group: "A" },
+  { id: "B01", name: "ICA Maxi Mölndal", fmt: "Maxi", chain: "ICA", prio: 2 },
+  { id: "B02", name: "ICA Maxi Högsbo", fmt: "Maxi", chain: "ICA", prio: 1 },
+  { id: "B03", name: "ICA Focus", fmt: "Kvantum", chain: "ICA", prio: 1 },
+  { id: "B04", name: "ICA Hovås", fmt: "Kvantum", chain: "ICA", prio: 1 },
+  { id: "B05", name: "ICA Kvantum Mölndal", fmt: "Kvantum", chain: "ICA", prio: 2 },
+  { id: "B06", name: "ICA Åkeredshallen", fmt: "Supermarket", chain: "ICA", prio: 3 },
+  { id: "B07", name: "ICA Nära Linné", fmt: "Nära", chain: "ICA", prio: 3 },
+  { id: "B08", name: "ICA Hajen Varberg", fmt: "Supermarket", chain: "ICA", prio: 3 },
+  { id: "B09", name: "ICA Kvantum Varberg", fmt: "Kvantum", chain: "ICA", prio: 2 },
+  { id: "B10", name: "Hemköp Vasagatan", fmt: "Hemköp", chain: "Axfood", prio: 2 },
+  { id: "B11", name: "ICA Kvantum Kungsbacka", fmt: "Kvantum", chain: "ICA", prio: 2 },
+  { id: "B12", name: "ICA Kungsmässan", fmt: "Kvantum", chain: "ICA", prio: 2 },
+  { id: "B13", name: "ICA Lerum Kvantum", fmt: "Kvantum", chain: "ICA", prio: 2 },
 ];
 const B2B_CUST = [
   { id: "C01", name: "Convini" },
@@ -33,16 +36,30 @@ const B2B_CUST = [
   { id: "C03", name: "Mässor & Events" },
   { id: "C04", name: "Övriga B2B" },
 ];
-const WEEKS = Array.from({ length: 16 }, (_, i) => i + 1);
+const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 const SHELF = 90;
 const MIN_SHELF_PCT = 0.7;
 const MAX_AGE_DELIVERY = Math.floor(SHELF * (1 - MIN_SHELF_PCT));
 const KOLLI = 12;
-const DEMO_GROUPS = { A: ["B01","B02","B05","B10"], B: ["B03","B04","B08"], C: ["B06","B07","B09"] };
-const DEMO_ROTATION = WEEKS.map(w => {
-  const r = w % 3;
-  return { week: w, groups: r === 1 ? ["A","B"] : r === 2 ? ["B","C"] : ["A","C"] };
-});
+// Prio 1: ICA Maxi Högsbo, ICA Focus, ICA Hovås — demo var 2:a vecka
+// Prio 2: Övriga Kvantum + Hemköp — demo var 3:e vecka  
+// Prio 3: Supermarket/Nära — demo var 4-6:e vecka
+const DEMO_SCHEDULE = [
+  { week:1,  day1:"Torsdag",  store1:"B02", day2:"Fredag",  store2:"B03", day3:"Lördag", store3:"B04" },
+  { week:2,  day1:"Torsdag",  store1:"B05", day2:"Fredag",  store2:"B12", day3:"Lördag", store3:"B11" },
+  { week:3,  day1:"Torsdag",  store1:"B02", day2:"Fredag",  store2:"B04", day3:"Lördag", store3:"B03" },
+  { week:4,  day1:"Torsdag",  store1:"B13", day2:"Fredag",  store2:"B09", day3:"Lördag", store3:"B10" },
+  { week:5,  day1:"Torsdag",  store1:"B02", day2:"Fredag",  store2:"B03", day3:"Lördag", store3:"B04" },
+  { week:6,  day1:"Torsdag",  store1:"B01", day2:"Fredag",  store2:"B05", day3:"Lördag", store3:"B06" },
+  { week:7,  day1:"Torsdag",  store1:"B02", day2:"Fredag",  store2:"B04", day3:"Lördag", store3:"B03" },
+  { week:8,  day1:"Torsdag",  store1:"B12", day2:"Fredag",  store2:"B11", day3:"Lördag", store3:"B07" },
+  { week:9,  day1:"Torsdag",  store1:"B02", day2:"Fredag",  store2:"B03", day3:"Lördag", store3:"B04" },
+  { week:10, day1:"Torsdag",  store1:"B13", day2:"Fredag",  store2:"B09", day3:"Lördag", store3:"B10" },
+  { week:11, day1:"Torsdag",  store1:"B02", day2:"Fredag",  store2:"B04", day3:"Lördag", store3:"B05" },
+  { week:12, day1:"Torsdag",  store1:"B03", day2:"Fredag",  store2:"B01", day3:"Lördag", store3:"B08" },
+];
+const DEMO_GROUPS = { A: ["B02","B03","B04"], B: ["B01","B05","B09","B10","B11","B12","B13"], C: ["B06","B07","B08"] };
+const DEMO_ROTATION = WEEKS.map(w => ({ week: w }));
 const KS = { sales: "tt3-s", tasks: "tt3-t", orders: "tt3-o", fc: "tt3-f", demo: "tt3-d", promo: "tt3-p", bakery: "tt3-b", packaging: "tt3-pk" };
 
 const BAKERY_INFO = { name: "Konditori Katarina", city: "Malmö", contact: "", phone: "", email: "", leadtime: 7, moq: 100 };
@@ -459,38 +476,66 @@ export default function App(){
 
     {/* ═══ DEMO SCHEMA ═══ */}
     {tab==="demo"&&(<div>
-      <PageHead title="Demo-schema & butiksrotation." sub="Demo"/>
+      <PageHead title="Demo-schema & rotation." sub="Demo"/>
       <p style={{fontFamily:"system-ui",fontSize:12,color:C.muted,margin:"0 0 16px",lineHeight:1.5}}>
-        10 butiker i 3 grupper (A/B/C). Varje vecka demoas 2 grupper — rotation säkerställer att alla butiker får jämn exponering. Mål: varje butik får demo minst 10 av 16 veckor.
+        13 butiker · 12 veckor · 3 dagar/vecka · 2 butiker/dag. Prio 1-butiker (ICA Maxi Högsbo, ICA Focus, ICA Hovås) demoas varannan vecka. Övriga roterar.
       </p>
-      <Card style={{marginBottom:16}}>
-        <Lbl>Grupper</Lbl>
+
+      {/* Prioritetslista */}
+      <Card style={{marginBottom:14}}>
+        <Lbl>Butiksprioritet</Lbl>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginTop:8}}>
-          {Object.entries(DEMO_GROUPS).map(([g,ids])=>(<div key={g} style={{background:C.cream,borderRadius:5,padding:12}}>
-            <div style={{fontWeight:700,marginBottom:6,fontSize:14}}>Grupp {g}</div>
-            {ids.map(id=>{const st=STORES.find(s=>s.id===id);return<div key={id} style={{fontSize:12,fontFamily:"system-ui",padding:"3px 0"}}>{st?.name} <span style={{color:"#bbb",fontSize:10}}>{st?.fmt}</span></div>})}
-          </div>))}
+          {[
+            {prio:1, label:"Prio 1 — Varje demo-runda", color:C.red, stores:STORES.filter(s=>s.prio===1)},
+            {prio:2, label:"Prio 2 — Varannan runda", color:C.navy, stores:STORES.filter(s=>s.prio===2)},
+            {prio:3, label:"Prio 3 — Sista rundorna", color:"#888", stores:STORES.filter(s=>s.prio===3)},
+          ].map(g=>(
+            <div key={g.prio} style={{background:C.cream,borderRadius:5,padding:12,borderTop:"3px solid "+g.color}}>
+              <div style={{fontWeight:700,marginBottom:6,fontSize:11,fontFamily:"system-ui",color:g.color,textTransform:"uppercase",letterSpacing:"0.06em"}}>{g.label}</div>
+              {g.stores.map(s=><div key={s.id} style={{fontSize:12,fontFamily:"system-ui",padding:"3px 0"}}>{s.name} <span style={{color:"#bbb",fontSize:10}}>{s.fmt}</span></div>)}
+            </div>
+          ))}
         </div>
       </Card>
-      <Card style={{marginBottom:16}}>
-        <Lbl>16-veckors rotation</Lbl>
-        <div style={{overflowX:"auto",marginTop:8}}>
+
+      {/* 12-veckors schema */}
+      <Card style={{marginBottom:14}}>
+        <Lbl>12-veckors demo-schema</Lbl>
+        <p style={{fontFamily:"system-ui",fontSize:11,color:"#aaa",margin:"4px 0 10px"}}>Torsdag & fredag eftermiddag/kväll · Lördag förmiddag. <span style={{color:"#B85042"}}>OBS: dubbelkolla tider med butikerna.</span></p>
+        <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
             <thead><tr style={{borderBottom:"2px solid "+C.red}}>
-              <th style={{textAlign:"left",padding:"6px 8px",fontWeight:700,fontSize:10}}>Vecka</th>
-              <th style={{textAlign:"left",padding:"6px 8px",fontSize:10}}>Demo-grupper</th>
-              <th style={{textAlign:"left",padding:"6px 8px",fontSize:10}}>Butiker med demo</th>
-              <th style={{textAlign:"left",padding:"6px 8px",fontSize:10}}>Anteckningar</th>
+              {["Vecka","Torsdag em/kväll","Fredag em/kväll","Lördag fm","Anteckningar"].map(h=>(
+                <th key={h} style={{textAlign:"left",padding:"6px 8px",fontWeight:700,fontSize:9,textTransform:"uppercase",letterSpacing:"0.04em"}}>{h}</th>
+              ))}
             </tr></thead>
             <tbody>
-              {DEMO_ROTATION.map(d=>{
-                const storeNames=d.groups.flatMap(g=>DEMO_GROUPS[g]).map(id=>STORES.find(s=>s.id===id)?.name?.split(" ").slice(-1)[0]||"");
-                return(<tr key={d.week} style={{borderBottom:"1px solid #E8E2DA"}}>
-                  <td style={{padding:"7px 8px",fontWeight:700,color:C.red}}>v{d.week}</td>
-                  <td style={{padding:"7px 8px"}}>{d.groups.map(g=><Badge key={g} bg={g==="A"?C.red:g==="B"?C.navy:C.green}>{g}</Badge>)}</td>
-                  <td style={{padding:"7px 8px",fontSize:10,color:"#666"}}>{storeNames.join(", ")}</td>
-                  <td style={{padding:"7px 8px"}}><input value={demoNotes[`w${d.week}`]||""} onChange={e=>setDemoNotes(p=>({...p,[`w${d.week}`]:e.target.value}))} placeholder="..." style={{width:"100%",border:"none",background:"transparent",fontSize:11,padding:0,outline:"none"}}/></td>
-                </tr>)})}
+              {DEMO_SCHEDULE.map(d=>{
+                const s1=STORES.find(s=>s.id===d.store1);
+                const s2=STORES.find(s=>s.id===d.store2);
+                const s3=STORES.find(s=>s.id===d.store3);
+                const prioColor=(p)=>p===1?C.red:p===2?C.navy:"#888";
+                return(
+                  <tr key={d.week} style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"8px 8px",fontWeight:700,color:C.red,fontSize:13}}>v{d.week}</td>
+                    <td style={{padding:"8px 8px"}}>
+                      <span style={{fontSize:11,fontWeight:600,color:prioColor(s1?.prio)}}>{s1?.name}</span>
+                      <div style={{fontSize:9,color:"#bbb"}}>{s1?.fmt}</div>
+                    </td>
+                    <td style={{padding:"8px 8px"}}>
+                      <span style={{fontSize:11,fontWeight:600,color:prioColor(s2?.prio)}}>{s2?.name}</span>
+                      <div style={{fontSize:9,color:"#bbb"}}>{s2?.fmt}</div>
+                    </td>
+                    <td style={{padding:"8px 8px"}}>
+                      <span style={{fontSize:11,fontWeight:600,color:prioColor(s3?.prio)}}>{s3?.name}</span>
+                      <div style={{fontSize:9,color:"#bbb"}}>{s3?.fmt}</div>
+                    </td>
+                    <td style={{padding:"8px 8px"}}>
+                      <input value={demoNotes[`w${d.week}`]||""} onChange={e=>setDemoNotes(p=>({...p,[`w${d.week}`]:e.target.value}))} placeholder="..." style={{width:"100%",border:"none",background:"transparent",fontSize:11,padding:0,outline:"none"}}/>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -498,11 +543,10 @@ export default function App(){
       <Card>
         <Lbl>Demo-tips</Lbl>
         <div style={{fontFamily:"system-ui",fontSize:12,color:"#666",lineHeight:1.7,marginTop:6}}>
-          <b>Tisdag–torsdag 15–18</b> är bästa demo-tiderna (högst konvertering).<br/>
-          <b>Mål:</b> 7-9 UPW per SKU. Maxi-butiker ger 6-8 st/SKU/vecka, Nära 3-5.<br/>
-          <b>Intro-erbjudande:</b> 10-20% rabatt demo-dagen skapar "call to action".<br/>
+          <b>Bästa dagar:</b> Torsdag, fredag och lördag. Tider: torsdag & fredag eftermiddag/kväll, lördag förmiddag. <span style={{color:"#B85042"}}>OBS: dubbelkolla detta mot faktisk butiksdata.</span><br/>
+          <b>Intro-erbjudande:</b> Oklart om detta är rätt strategi — utvärderas under piloten.<br/>
           <b>Placering:</b> Be om gondolände eller kassanära — inte inne i hyllan.<br/>
-          <b>Mät:</b> Antal smakprov utdelade vs antal köp = konverterings-%. Bra benchmark: 15-25%.<br/>
+          <b>Mätning smakprov:</b> Vi räknar själva. Enklast: ta med ett räkneblock eller använd Notes på telefonen — ett streck per utdelat prov, ett streck per köp. Räkna av vid dagens slut. Konvertering = köp / utdelade prov × 100.<br/>
           <b>Kostnad:</b> ~3000-3500 kr/dag med extern demopersonal (Thea själv = gratis + bättre).
         </div>
       </Card>
@@ -762,7 +806,7 @@ export default function App(){
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:10,marginTop:10}}>
           {[
             {l:"UPW",v:m.dvh.upw.toFixed(1),s:"Mål ≥7",ok:m.dvh.upw>=7},
-            {l:"Total DVH units",v:fmt(m.dvh.tot),s:"16 veckor pilot"},
+            {l:"Total DVH units",v:fmt(m.dvh.tot),s:"12 veckor pilot"},
             {l:"Total B2B units",v:fmt(m.b2b.tot),s:"Convini, Fruktbudet m.fl."},
             {l:"V/V tillväxt",v:m.dvh.aw>1?fp(m.dvh.avgGr):"—",s:"Positiv = starkt",ok:m.dvh.avgGr>0},
           ].map((x,i)=>(<div key={i} style={{background:C.cream,borderRadius:5,padding:"12px 14px"}}>
