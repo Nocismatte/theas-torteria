@@ -1741,7 +1741,7 @@ Svara alltid på svenska. Var konkret, direkt och strategisk. Ge specifika siffr
             method:"POST",
             headers:{"Content-Type":"application/json","x-api-key":anthropicKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
             body:JSON.stringify({
-              model:"claude-sonnet-4-20250514",
+              model:"claude-opus-4-5",
               max_tokens:1000,
               system:buildContext(),
               messages:newHistory.map(m=>({role:m.role,content:m.content}))
