@@ -256,6 +256,7 @@ export default function App(){
   const [aiLoading,setAiLoading]=useState(false);
   const [aiInitDone,setAiInitDone]=useState(false);
   const [anthropicKey,setAnthropicKey]=useState(()=>localStorage.getItem("tt3-anthropic-key")||"");
+  const [finScenario,setFinScenario]=useState("v7");
   const [inventory,setInventory]=useState(()=>ld("tt3-inv",{kakLager:{},forpLager:{}}));
   const chatRef=useRef(null);
   const [tab,setTab]=useState("dashboard");
@@ -353,9 +354,9 @@ export default function App(){
     {id:"tasks",label:"To Do"},
     {id:"input",label:"Rapportera"},
     {id:"demo",label:"Demo-schema"},
-    {id:"forecast",label:"Forecast & Lager"},
+    {id:"forecast",label:"Lagerstatus"},
     {id:"orders",label:"Ordrar"},
-    {id:"bakery",label:"Inköp & Produktion"},
+    {id:"bakery",label:"Produktionsordrar"},
     {id:"packaging",label:"Förpackningsorder"},
     {id:"pitch",label:"Kedjepitch"},
     {id:"pilot",label:"Provförsäljning 2026"},
@@ -744,7 +745,7 @@ export default function App(){
 
     {/* ═══ FORECAST ═══ */}
     {tab==="forecast"&&(<div>
-      <PageHead title="Forecast & Lagerstatus." sub="Forecast & Lager"/>
+      <PageHead title="Lagerstatus." sub="Lagerstatus"/>
 
       {/* KPI-rad */}
       <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:14}}>
@@ -1337,7 +1338,7 @@ export default function App(){
 
     {/* ═══ KONDITORI KATARINA ═══ */}
     {tab==="bakery"&&(<div>
-      <PageHead title="Inköp & Produktion." sub="Konditori Katarina, Malmö"/>
+      <PageHead title="Produktionsordrar." sub="Konditori Katarina, Malmö"/>
 
       {/* Leverantörskort */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:14}}>
@@ -1562,7 +1563,7 @@ export default function App(){
 
       {/* Scenarioväxlare */}
       {(()=>{
-        const [scenario,setScenario]=useState("v7");
+        const scenario=finScenario;
         const YEARS=["2026","2027","2028","2029","2030"];
 
         // Data från excel
@@ -1594,7 +1595,7 @@ export default function App(){
           {/* Scenarioknappar */}
           <div style={{display:"flex",gap:8,marginBottom:14}}>
             {[{id:"v7",l:"2027 Lansering V7 (rekommenderat)"},{id:"v16",l:"2027 Lansering V16"}].map(s=>(
-              <button key={s.id} onClick={()=>setScenario(s.id)} style={{padding:"7px 16px",borderRadius:5,border:"1px solid "+C.border,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"Georgia,serif",background:scenario===s.id?C.red:"#fff",color:scenario===s.id?"#fff":"#999"}}>{s.l}</button>
+              <button key={s.id} onClick={()=>setFinScenario(s.id)} style={{padding:"7px 16px",borderRadius:5,border:"1px solid "+C.border,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"Georgia,serif",background:scenario===s.id?C.red:"#fff",color:scenario===s.id?"#fff":"#999"}}>{s.l}</button>
             ))}
           </div>
 
