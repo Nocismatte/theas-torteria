@@ -280,6 +280,41 @@ export default function App(){
   useEffect(()=>{sv("tt3-ideas",ideas)},[ideas]);
   useEffect(()=>{sv("tt3-inv",inventory)},[inventory]);
 
+  // Auto-sync: beräkna förpackningslager från förpackningsordrar (Kartongbolaget)
+  // Summerar alla levererade + bekräftade ordrar per SKU (150g)
+  useEffect(()=>{
+    const forpFromOrders={};
+    pkgOrders.forEach(o=>{
+      if(["Levererad","Under transport","Bekräftad"].includes(o.status)){
+        (o.items150||[]).forEach(it=>{
+          forpFromOrders[`left_${it.skuId}`]=(forpFromOrders[`left_${it.skuId}`]||0)+(+it.qty||0);
+        });
+      }
+    });
+    // Merge with manual inventory — orders add to base, manual adjustments override
+    setInventory(prev=>({
+      ...prev,
+      forpLager:{...forpFromOrders,...Object.fromEntries(
+        Object.entries(prev.forpLager).filter(([k])=>!k.startsWith("left_")||!(k.replace("left_","") in Object.fromEntries(Object.keys(forpFromOrders).map(k2=>[k2.replace("left_",""),true]))))
+      ), ...forpFromOrders}
+    }));
+  },[pkgOrders]);
+
+  // Auto-sync: beräkna kaklager från bakery-ordrar (Konditori Katarina)
+  useEffect(()=>{
+    const kakFromOrders={};
+    bakeryOrders.forEach(o=>{
+      if(["Levererad","Redo för leverans","Bekräftad"].includes(o.status)){
+        (o.items||[]).forEach(it=>{
+          kakFromOrders[it.skuId]=(kakFromOrders[it.skuId]||0)+(+it.qty||0);
+        });
+      }
+    });
+    if(Object.keys(kakFromOrders).length>0){
+      setInventory(prev=>({...prev,kakLager:{...prev.kakLager,...kakFromOrders}}));
+    }
+  },[bakeryOrders]);
+
   const gk=(c,w,l,s)=>`${c}-${w}-${l}-${s}`;
   const gv=(c,w,l,s)=>sales[gk(c,w,l,s)]||0;
   const sv2=(c,w,l,s,v)=>setSales(p=>({...p,[gk(c,w,l,s)]:parseInt(v)||0}));
@@ -787,8 +822,12 @@ export default function App(){
 
       {/* Lagerstatus */}
       <Card style={{marginBottom:14}}>
-        <Lbl>Lagerstatus — 150g förpackningar hos Konditoriet</Lbl>
-        <p style={{fontFamily:"system-ui",fontSize:11,color:"#aaa",margin:"4px 0 10px"}}>Förpackningsmaterial skickat från Kartongbolaget → mottagit hos Konditoriet. Uppdatera manuellt.</p>
+        <Lbl>Lagerstatus — automatiskt från ordrar</Lbl>
+        <div style={{background:"#EEF2FF",border:"1px solid #c7d2fe",borderRadius:5,padding:"8px 12px",marginBottom:10,fontFamily:"system-ui",fontSize:11,color:"#444"}}>
+          <b>Förpackningar (150g)</b> syncar automatiskt från förpackningsordrar med status <i>Bekräftad, Under transport eller Levererad</i>.<br/>
+          <b>Kaklager</b> syncar automatiskt från produktionsordrar till Konditori Katarina med status <i>Bekräftad, Redo för leverans eller Levererad</i>.<br/>
+          Du kan också justera manuellt nedan om något inte stämmer.
+        </div>
         <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
           {SKUS.map(sk=>{
             const forpSent=parseInt(inventory.forpLager?.[`sent_${sk.id}`]||0);
