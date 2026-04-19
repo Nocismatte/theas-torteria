@@ -525,7 +525,7 @@ export default function App(){
         <Sel label="Vecka" value={wk} onChange={v=>setWk(+v)} opts={WEEKS.map(w=>({v:w,l:`Vecka ${w}`}))}/>
         {ch==="dvh"?<Sel label="Butik" value={loc} onChange={setLoc} opts={STORES.map(s=>({v:s.id,l:s.name}))}/>:<div style={{display:"flex",gap:8,flex:1}}><Sel label="Kund" value={b2bC} onChange={setB2bC} opts={B2B_CUST.map(c=>({v:c.id,l:c.name}))}/>{b2bC==="C04"&&<Inp label="Företagsnamn (Övriga B2B)" value={sales[`b2b_comment_${b2bC}`]||""} onChange={v=>setSales(p=>({...p,[`b2b_comment_${b2bC}`]:v}))}/>}</div>}
       </div>
-      <Card>
+      <Card style={{marginBottom:12}}>
         <div style={{display:"grid",gap:8}}>
           {SKUS.map(sk=>{const lc=ch==="dvh"?loc:b2bC;const v=gv(ch,wk,lc,sk.id);return(
             <div key={sk.id} style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px",background:C.cream,borderRadius:5}}>
@@ -537,8 +537,53 @@ export default function App(){
           )})}
         </div>
         <div style={{marginTop:12,padding:"10px 12px",background:C.dark,borderRadius:5,display:"flex",justifyContent:"space-between",color:C.cream,alignItems:"center"}}>
-          <span style={{fontSize:11,fontFamily:"system-ui"}}>Total</span>
+          <span style={{fontSize:11,fontFamily:"system-ui"}}>Denna vecka / {ch==="dvh"?STORES.find(s=>s.id===loc)?.name:B2B_CUST.find(c=>c.id===b2bC)?.name}</span>
           <span style={{fontSize:18,fontWeight:700}}>{SKUS.reduce((s,sk)=>s+gv(ch,wk,ch==="dvh"?loc:b2bC,sk.id),0)} st <span style={{fontSize:11,fontWeight:400,color:"#999"}}>({Math.ceil(SKUS.reduce((s,sk)=>s+gv(ch,wk,ch==="dvh"?loc:b2bC,sk.id),0)/KOLLI)} kolli)</span></span>
+        </div>
+      </Card>
+
+      {/* Summering — alla veckor */}
+      <Card>
+        <Lbl>Summering — alla registrerade veckor ({ch==="dvh"?"DVH 150g":"B2B 400g"})</Lbl>
+        <div style={{overflowX:"auto",marginTop:8}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
+            <thead>
+              <tr style={{borderBottom:"2px solid "+C.red}}>
+                <th style={{textAlign:"left",padding:"5px 8px",fontSize:9,textTransform:"uppercase",fontWeight:700}}>{ch==="dvh"?"Butik":"Kund"}</th>
+                {SKUS.map(sk=><th key={sk.id} style={{textAlign:"center",padding:"5px 6px",fontSize:9,textTransform:"uppercase",fontWeight:700}}>{sk.name.split(" ")[0]}</th>)}
+                <th style={{textAlign:"right",padding:"5px 8px",fontSize:9,textTransform:"uppercase",fontWeight:700}}>Totalt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(ch==="dvh"?STORES:B2B_CUST).map(loc2=>{
+                const locId=ch==="dvh"?loc2.id:loc2.id;
+                const rowTot=SKUS.reduce((s,sk)=>s+WEEKS.reduce((ws,w)=>ws+gv(ch,w,locId,sk.id),0),0);
+                if(rowTot===0)return null;
+                return(
+                  <tr key={locId} style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"5px 8px",fontWeight:600,fontSize:11}}>{ch==="dvh"?loc2.name:loc2.name}</td>
+                    {SKUS.map(sk=>{
+                      const tot=WEEKS.reduce((ws,w)=>ws+gv(ch,w,locId,sk.id),0);
+                      return<td key={sk.id} style={{padding:"5px 6px",textAlign:"center",color:tot>0?C.dark:"#ddd"}}>{tot>0?tot:"—"}</td>;
+                    })}
+                    <td style={{padding:"5px 8px",textAlign:"right",fontWeight:700,color:C.red}}>{rowTot}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr style={{borderTop:"2px solid "+C.red,background:C.card}}>
+                <td style={{padding:"6px 8px",fontWeight:700,fontSize:11}}>TOTALT</td>
+                {SKUS.map(sk=>{
+                  const tot=(ch==="dvh"?STORES:B2B_CUST).reduce((s,l2)=>s+WEEKS.reduce((ws,w)=>ws+gv(ch,w,l2.id,sk.id),0),0);
+                  return<td key={sk.id} style={{padding:"6px 6px",textAlign:"center",fontWeight:700,color:C.red}}>{tot>0?tot:"—"}</td>;
+                })}
+                <td style={{padding:"6px 8px",textAlign:"right",fontWeight:700,color:C.red,fontSize:13}}>
+                  {(ch==="dvh"?STORES:B2B_CUST).reduce((s,l2)=>s+SKUS.reduce((ss,sk)=>ss+WEEKS.reduce((ws,w)=>ws+gv(ch,w,l2.id,sk.id),0),0),0)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </Card>
     </div>)}
@@ -673,7 +718,7 @@ export default function App(){
           {l:"Min. vid leverans till butik",v:"70% kvar",s:`Max ${MAX_AGE_DELIVERY}d gammal`,c:"#B85042"},
           {l:"Kolli",v:`${KOLLI} förp/kolli`,c:C.navy},
           {l:"Ledtid Konditoriet",v:`${bakeryInfo.leadtime||7}d`,c:C.green},
-          {l:"Ledtid Kartongbolaget",v:`${pkgInfo.leadtime||14}d`,c:"#888"},
+          {l:"Ledtid Polfärskt",v:"14d",c:"#888"},
         ].map((x,i)=>(
           <div key={i} style={{flex:"1 1 120px",background:C.card,borderRadius:6,padding:"10px 14px",position:"relative",overflow:"hidden"}}>
             <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:x.c}}/>
@@ -868,15 +913,27 @@ export default function App(){
               <td style={{padding:"5px"}}><input type="date" value={p.end||""} onChange={e=>{const u=[...promos];u[i]={...u[i],end:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px"}}/></td>
               <td style={{padding:"5px"}}><input type="number" value={p.budget||""} onChange={e=>{const u=[...promos];u[i]={...u[i],budget:e.target.value};setPromos(u)}} placeholder="0" style={{width:65,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"right"}}/></td>
               <td style={{padding:"5px"}}><input type="number" value={p.result||""} onChange={e=>{const u=[...promos];u[i]={...u[i],result:e.target.value};setPromos(u)}} placeholder="—" style={{width:65,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"right",color:p.result&&+p.result>=(+p.budget||0)?C.green:C.red}}/></td>
-              <td style={{padding:"5px"}}><input value={p.hitrate||""} onChange={e=>{const u=[...promos];u[i]={...u[i],hitrate:e.target.value};setPromos(u)}} placeholder="%" style={{width:45,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"center"}}/></td>
+              <td style={{padding:"5px"}}>
+                <div style={{display:"flex",gap:2,alignItems:"center"}}>
+                  <input type="number" value={p.pitched||""} onChange={e=>{const u=[...promos];u[i]={...u[i],pitched:e.target.value};setPromos(u)}} placeholder="Tot" title="Antal pitchade" style={{width:35,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 3px",textAlign:"center"}}/>
+                  <span style={{fontSize:9,color:"#bbb"}}>/</span>
+                  <input type="number" value={p.yesses||""} onChange={e=>{const u=[...promos];u[i]={...u[i],yesses:e.target.value};setPromos(u)}} placeholder="Ja" title="Antal ja" style={{width:30,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 3px",textAlign:"center"}}/>
+                  {p.pitched>0&&<span style={{fontSize:10,fontWeight:700,color:Math.round((+p.yesses||0)/(+p.pitched)*100)>=50?C.green:C.red}}>{Math.round((+p.yesses||0)/(+p.pitched)*100)}%</span>}
+                </div>
+              </td>
               <td style={{padding:"5px"}}><select value={p.status} onChange={e=>{const u=[...promos];u[i]={...u[i],status:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px",background:p.status==="Aktiv"?"#D4EDDA":p.status==="Klar"?"#e8f5e9":p.status==="Godkänd"?"#FFF3CD":"#fff"}}>{["Planerad","Ansökt","Godkänd","Aktiv","Klar"].map(s=><option key={s}>{s}</option>)}</select></td>
-              <td style={{padding:"5px"}}><input value={p.notes||""} onChange={e=>{const u=[...promos];u[i]={...u[i],notes:e.target.value};setPromos(u)}} style={{border:"none",background:"transparent",fontSize:10,width:80}} placeholder="..."/></td>
+              <td style={{padding:"5px"}}><input value={p.notes||""} onChange={e=>{const u=[...promos];u[i]={...u[i],notes:e.target.value};setPromos(u)}} style={{border:"none",background:"transparent",fontSize:10,width:70}} placeholder="Ant..."/></td>
+              <td style={{padding:"5px"}}><input value={p.eval||""} onChange={e=>{const u=[...promos];u[i]={...u[i],eval:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,width:100,padding:"2px 4px"}} placeholder="Vad gick bra/dåligt?"/></td>
               <td style={{padding:"5px"}}><button onClick={()=>setPromos(p=>p.filter((_,j)=>j!==i))} style={{background:"none",border:"none",cursor:"pointer",color:"#ddd",fontSize:14}}>×</button></td>
             </tr>);
           })}</tbody>
         </table>
       </Card>}
 
+      {/* Hitrate förklaring */}
+      <div style={{background:"#EEF2FF",border:"1px solid #c7d2fe",borderRadius:5,padding:"10px 14px",marginBottom:14,fontFamily:"system-ui",fontSize:11,color:"#444"}}>
+        <b style={{color:C.navy}}>💡 Hitrate</b> = andel som säger ja när du pitchar. Fyll i <b>Pitchade</b> (hur många du frågat) och <b>Ja</b> (hur många som accepterade) — procenten beräknas automatiskt. Exempel: du pitchar 5 butikschefer om gondolände, 3 säger ja → hitrate 60%.
+      </div>
       {/* Kommande due dates */}
       {promos.filter(p=>p.deadline&&p.status!=="Klar").length>0&&<Card style={{marginBottom:14}}>
         <Lbl>Kommande due dates</Lbl>
@@ -1077,7 +1134,7 @@ export default function App(){
             {l:"Konsumentpris",v:"69 kr",s:"150g premium"},
             {l:"DVH-marginal",v:"30%",s:"Standard"},
             {l:"NSV/enhet",v:"31,90 kr",s:"Efter kedja + logistik"},
-            {l:"Proj. nationell årsvolym",v:m.dvh.upw>0?fmt(Math.round(m.dvh.upw*500*3*52)):"—",s:"500 butiker × 3 SKU"},
+            {l:"Proj. nationell årsvolym",v:m.dvh.upw>0?fmt(Math.round(m.dvh.upw*500*5*52)):"—",s:"500 butiker × 5 SKU × UPW × 52v"},
           ].map((x,i)=>(<div key={i} style={{background:C.cream,borderRadius:5,padding:"12px 14px"}}>
             <div style={{fontSize:10,fontFamily:"system-ui",color:"#aaa",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3}}>{x.l}</div>
             <div style={{fontFamily:"Georgia,serif",fontSize:24,fontWeight:700,color:C.dark}}>{x.v}</div>
@@ -1090,7 +1147,7 @@ export default function App(){
         <div style={{display:"grid",gap:6,marginTop:8,fontFamily:"system-ui",fontSize:12}}>
           {[
             ["Kategorins storlek","1,5-2,5 mdr kr","Nielsen"],
-            ["Svensk hantverkstradition","Recept & process sedan 1950-tal","Autenticitet"],
+            ["Producerat i Sverige","Svensk hantverkstradition & lokala råvaror","Ursprung & autenticitet"],
             ["Clean label: 6 ingredienser","vs 15-24 hos konkurrenter","Konsumenttrend"],
             ["Äkta Vara + Från Sverige","Certifiering pågår","Trovärdighet"],
             ["Hållbarhet 90d, ingen kylkedja","Låg logistikkostnad","Operativt"],
