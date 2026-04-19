@@ -257,6 +257,7 @@ export default function App(){
   const [aiInitDone,setAiInitDone]=useState(false);
   const [anthropicKey,setAnthropicKey]=useState(()=>localStorage.getItem("tt3-anthropic-key")||"");
   const [finScenario,setFinScenario]=useState("v7");
+  const [prodScenario,setProdScenario]=useState("A");
   const [inventory,setInventory]=useState(()=>ld("tt3-inv",{kakLager:{},forpLager:{}}));
   const chatRef=useRef(null);
   const [tab,setTab]=useState("dashboard");
@@ -1564,6 +1565,7 @@ export default function App(){
       {/* Scenarioväxlare */}
       {(()=>{
         const scenario=finScenario;
+        const ps=prodScenario;
         const YEARS=["2026","2027","2028","2029","2030"];
 
         // Data från excel
@@ -1571,8 +1573,8 @@ export default function App(){
           nsv:    {v7:[232232,4402200,16919760,44864820,60000000], v16:[232232,3540900,16919760,44864820,60000000]},
           cogs:   {v7:[192920,3312000,9971520,21498750,26250000],  v16:[192920,2664000,9971520,21498750,26250000]},
           fixed:  [1723318,2069832,4060420,8305299,12000000],
-          extcap: [1700000,3000000,2000000,10000000,5000000],
-          kundfod:[0,1500000,1000000,3000000,6000000],
+          extcap: prodScenario==="A"?[1700000,3000000,2000000,10000000,5000000]:[1700000,3000000,2000000,5000000,3000000],
+          kundfod: prodScenario==="A"?[0,1500000,1000000,3000000,6000000]:[0,1500000,1000000,3000000,4000000],
         };
 
         const nsv  = scenario==="v7"?DATA.nsv.v7:DATA.nsv.v16;
@@ -1593,9 +1595,16 @@ export default function App(){
 
         return(<div>
           {/* Scenarioknappar */}
-          <div style={{display:"flex",gap:8,marginBottom:14}}>
+          <div style={{display:"flex",gap:8,marginBottom:8,flexWrap:"wrap"}}>
             {[{id:"v7",l:"2027 Lansering V7 (rekommenderat)"},{id:"v16",l:"2027 Lansering V16"}].map(s=>(
               <button key={s.id} onClick={()=>setFinScenario(s.id)} style={{padding:"7px 16px",borderRadius:5,border:"1px solid "+C.border,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"Georgia,serif",background:scenario===s.id?C.red:"#fff",color:scenario===s.id?"#fff":"#999"}}>{s.l}</button>
+            ))}
+          </div>
+          <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+            {[{id:"A",l:"Scenario A — Med egen produktion 2029",desc:"10 Mkr externt 2029"},{id:"B",l:"Scenario B — Utan egen produktion",desc:"5 Mkr externt 2029"}].map(s=>(
+              <button key={s.id} onClick={()=>setProdScenario(s.id)} style={{padding:"7px 16px",borderRadius:5,border:"1px solid "+C.border,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"Georgia,serif",background:prodScenario===s.id?C.navy:"#fff",color:prodScenario===s.id?"#fff":"#999"}}>
+                {s.l} <span style={{fontSize:10,fontWeight:400,opacity:0.7}}>({s.desc})</span>
+              </button>
             ))}
           </div>
 
