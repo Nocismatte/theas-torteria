@@ -1547,228 +1547,171 @@ export default function App(){
     </div>)}
 
     {/* ═══ KAPITAL & FORECAST ═══ */}
-    {tab==="finance"&&(()=>{
-      const months=["Jan","Feb","Mar","Apr","Maj","Jun","Jul","Aug","Sep","Okt","Nov","Dec"];
-      const today=new Date();
-      const startMonth=today.getMonth();
-      const startYear=today.getFullYear();
+    {tab==="finance"&&(<div>
+      <PageHead title="Kapital & Resultat." sub="Kapital & Forecast"/>
 
-      // Bygg 12-månaders forecast
-      const forecastData=Array.from({length:finSettings.forecastMonths||12},(_,i)=>{
-        const mIdx=(startMonth+i)%12;
-        const yr=startYear+Math.floor((startMonth+i)/12);
-        const label=`${months[mIdx]} ${yr}`;
-        const isCentral=i>=(finSettings.centralLaunchMonth||7);
-        // Projicerad tillväxt baserad på UPW + scale
-        const dvhStores=isCentral?500:10;
-        const upwBase=m.dvh.upw>0?m.dvh.upw:5;
-        const growth=isCentral?1.15:1.08;
-        const upwProj=Math.min(upwBase*Math.pow(growth,i),14);
-        const dvhUnits=Math.round(upwProj*dvhStores*7*4.3);
-        const b2bUnits=Math.round(dvhUnits*0.12);
-        const nsv=dvhUnits*31.9+b2bUnits*55;
-        // Kostnader
-        const cogsDvh=dvhUnits*26.5;
-        const cogsB2b=b2bUnits*45;
-        const pkgCost=(dvhUnits*1.2+b2bUnits*2.5);
-        const logistik=isCentral?dvhUnits*2.5:dvhUnits*1.2;
-        const tradeMarketing=isCentral?nsv*0.10:nsv*0.05;
-        const fixed=isCentral?25000:8000;
-        const totalCost=cogsDvh+cogsB2b+pkgCost+logistik+tradeMarketing+fixed;
-        const grossProfit=nsv-totalCost;
-        return {label,mIdx,yr,dvhUnits,b2bUnits,nsv,totalCost,grossProfit,upwProj,isCentral,cogsDvh,cogsB2b,pkgCost,logistik,tradeMarketing,fixed};
-      });
-
-      // Kassaflöde med manuella poster
-      const cfByMonth={};
-      cashflows.forEach(cf=>{if(!cfByMonth[cf.month])cfByMonth[cf.month]=[];cfByMonth[cf.month].push(cf);});
-      let runningBalance=finSettings.openingBalance||50000;
-      const balances=forecastData.map((fd,i)=>{
-        const manualIn=(cfByMonth[i]||[]).filter(c=>c.type==="in").reduce((s,c)=>s+(+c.amount||0),0);
-        const manualOut=(cfByMonth[i]||[]).filter(c=>c.type==="out").reduce((s,c)=>s+(+c.amount||0),0);
-        const projIn=fd.nsv;
-        const projOut=fd.totalCost;
-        runningBalance+=projIn+manualIn-projOut-manualOut;
-        return{...fd,manualIn,manualOut,balance:runningBalance};
-      });
-      const maxNSV=Math.max(...balances.map(b=>b.nsv),1);
-      const minBalance=Math.min(...balances.map(b=>b.balance));
-
-      return(<div>
-        <PageHead title="Kapital & Försäljningsforecast." sub="Ekonomi"/>
-
-        {/* Förklaring kassaflöde */}
-        <div style={{background:"#EEF2FF",border:"1px solid #c7d2fe",borderRadius:6,padding:"12px 14px",marginBottom:14,fontFamily:"system-ui",fontSize:12}}>
-          <div style={{fontWeight:700,color:C.navy,marginBottom:6}}>💡 Vad är kassaflöde?</div>
-          <div style={{color:"#444",lineHeight:1.7}}>
-            <b>Kassaflöde</b> = pengar in minus pengar ut. Det visar om du har pengar kvar i kassan.<br/>
-            <b>Projicerat kassaflöde</b> = vad appen beräknar baserat på dina försäljningsvolymer och kostnader.<br/>
-            <b>Manuella transaktioner</b> = saker appen inte vet om: kapitalinjektioner (pengar du får in), investeringar, lån, engångskostnader.<br/>
-            <b>Exempel:</b> Om en investerare ger dig 1,5 Mkr i maj 2026 — lägg in det som "Inbetalning" för den månaden. Om du köper en förpackningsmaskin för 200k — lägg in det som "Utbetalning".<br/>
-            <b>Balansen</b> visar om du har pengar nog att driva verksamheten utan att gå minus.
-          </div>
+      {/* Kassaflöde-förklaring */}
+      <div style={{background:"#EEF2FF",border:"1px solid #c7d2fe",borderRadius:6,padding:"12px 14px",marginBottom:14,fontFamily:"system-ui",fontSize:12}}>
+        <div style={{fontWeight:700,color:C.navy,marginBottom:6}}>💡 Kassaflöde & kapitalbehov</div>
+        <div style={{color:"#444",lineHeight:1.7}}>
+          <b>Organiskt kassaflöde</b> = vad du genererar från försäljning minus kostnader.<br/>
+          <b>Kundfordringar</b> = ICA/Coop/Axfood betalar 30-60 dagar efter leverans — du måste förfinansiera detta.<br/>
+          <b>Externt kapital</b> = investerare eller lån du tar in för att täcka underskott + driva tillväxt.
         </div>
+      </div>
 
-        {/* Inställningar */}
-        <Card style={{marginBottom:14}}>
-          <Lbl>Inställningar</Lbl>
-          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginTop:8}}>
-            <div style={{flex:"1 1 150px"}}>
-              <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.04em",marginBottom:3}}>Nuvarande kassan (kr)</div>
-              <input type="number" value={finSettings.openingBalance||""} onChange={e=>setFinSettings(p=>({...p,openingBalance:+e.target.value}))} style={{width:"100%",padding:"7px 10px",borderRadius:5,border:"1px solid "+C.border,fontSize:13,fontFamily:"system-ui"}}/>
-            </div>
-            <div style={{flex:"1 1 150px"}}>
-              <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.04em",marginBottom:3}}>Månad för central listning</div>
-              <select value={finSettings.centralLaunchMonth||7} onChange={e=>setFinSettings(p=>({...p,centralLaunchMonth:+e.target.value}))} style={{width:"100%",padding:"7px 10px",borderRadius:5,border:"1px solid "+C.border,fontSize:13,fontFamily:"system-ui",background:"#fff"}}>
-                {Array.from({length:12},(_,i)=><option key={i} value={i}>{`Om ${i} månader (${months[(startMonth+i)%12]})`}</option>)}
-              </select>
-            </div>
-            <div style={{flex:"1 1 150px"}}>
-              <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.04em",marginBottom:3}}>Forecast-horisont (månader)</div>
-              <select value={finSettings.forecastMonths||12} onChange={e=>setFinSettings(p=>({...p,forecastMonths:+e.target.value}))} style={{width:"100%",padding:"7px 10px",borderRadius:5,border:"1px solid "+C.border,fontSize:13,fontFamily:"system-ui",background:"#fff"}}>
-                {[6,12,18,24].map(n=><option key={n} value={n}>{n} månader</option>)}
-              </select>
-            </div>
+      {/* Scenarioväxlare */}
+      {(()=>{
+        const [scenario,setScenario]=useState("v7");
+        const YEARS=["2026","2027","2028","2029","2030"];
+
+        // Data från excel
+        const DATA={
+          nsv:    {v7:[232232,4402200,16919760,44864820,60000000], v16:[232232,3540900,16919760,44864820,60000000]},
+          cogs:   {v7:[192920,3312000,9971520,21498750,26250000],  v16:[192920,2664000,9971520,21498750,26250000]},
+          fixed:  [1723318,2069832,4060420,8305299,12000000],
+          extcap: [1700000,3000000,2000000,10000000,5000000],
+          kundfod:[0,1500000,1000000,3000000,6000000],
+        };
+
+        const nsv  = scenario==="v7"?DATA.nsv.v7:DATA.nsv.v16;
+        const cogs = scenario==="v7"?DATA.cogs.v7:DATA.cogs.v16;
+        const gross = nsv.map((n,i)=>n-cogs[i]);
+        const result = gross.map((g,i)=>g-DATA.fixed[i]);
+        const underskott = result.map(r=>r<0?-r:0);
+        const totMin = underskott.map((u,i)=>u+DATA.kundfod[i]);
+        const tackUnd = DATA.extcap.map((e,i)=>Math.min(e,totMin[i]));
+        const tillTillv = DATA.extcap.map((e,i)=>e-tackUnd[i]);
+        const kassa = DATA.extcap.map((e,i,arr)=>{
+          let k=0;
+          for(let j=0;j<=i;j++) k+=arr[j]+result[j];
+          return k;
+        });
+
+        const prioColor=(val,green,red)=>val>=green?C.green:val<=red?C.red:"#B85042";
+
+        return(<div>
+          {/* Scenarioknappar */}
+          <div style={{display:"flex",gap:8,marginBottom:14}}>
+            {[{id:"v7",l:"2027 Lansering V7 (rekommenderat)"},{id:"v16",l:"2027 Lansering V16"}].map(s=>(
+              <button key={s.id} onClick={()=>setScenario(s.id)} style={{padding:"7px 16px",borderRadius:5,border:"1px solid "+C.border,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"Georgia,serif",background:scenario===s.id?C.red:"#fff",color:scenario===s.id?"#fff":"#999"}}>{s.l}</button>
+            ))}
           </div>
-        </Card>
 
-        {/* KPI-rad */}
-        <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:14}}>
-          <KpiCard label="Total proj. NSV" value={`${Math.round(balances.reduce((s,b)=>s+b.nsv,0)/1000)} kkr`} sub={`${finSettings.forecastMonths} månader`}/>
-          <KpiCard label="Proj. NSV år 1" value={`${Math.round(balances.slice(0,12).reduce((s,b)=>s+b.nsv,0)/1000)} kkr`} accent="#8B1A1E"/>
-          <KpiCard label="Kassan i slutet" value={`${Math.round(balances[balances.length-1]?.balance/1000||0)} kkr`} accent={balances[balances.length-1]?.balance>0?C.green:C.red}/>
-          <KpiCard label="Lägst kassan" value={`${Math.round(minBalance/1000)} kkr`} accent={minBalance>0?C.green:C.red} sub={minBalance<0?"Kapital krävs":"OK"}/>
-          <KpiCard label="Break-even månad" value={balances.find(b=>b.grossProfit>0)?.label||"—"} accent={C.navy}/>
-        </div>
-
-        {/* NSV-stapeldiagram */}
-        <Card style={{marginBottom:14}}>
-          <Lbl>Projicerad månadsförsäljning (NSV)</Lbl>
-          <div style={{display:"flex",alignItems:"flex-end",gap:4,height:110,marginTop:10}}>
-            {balances.map((b,i)=>{
-              const h=b.nsv/maxNSV*95;
-              return(
-                <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-                  {b.nsv>maxNSV*0.6&&<div style={{fontSize:7,color:"#aaa",fontFamily:"system-ui"}}>{Math.round(b.nsv/1000)}k</div>}
-                  <div style={{width:"100%",height:h,minHeight:2,background:b.isCentral?C.navy:C.red,borderRadius:"2px 2px 0 0",transition:"height 0.3s",position:"relative"}}>
-                    {b.isCentral&&i===finSettings.centralLaunchMonth&&<div style={{position:"absolute",top:-14,left:"50%",transform:"translateX(-50%)",fontSize:7,color:C.navy,fontFamily:"system-ui",fontWeight:700,whiteSpace:"nowrap"}}>Central</div>}
-                  </div>
-                  <div style={{fontSize:7,color:"#bbb",fontFamily:"system-ui",writingMode:"vertical-lr",transform:"rotate(180deg)",height:24}}>{b.label.split(" ")[0]}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div style={{display:"flex",gap:12,marginTop:8,fontFamily:"system-ui",fontSize:10,color:"#999"}}>
-            <span><span style={{display:"inline-block",width:10,height:10,background:C.red,borderRadius:2,marginRight:4}}/>Pilot (DVH 10 butiker)</span>
-            <span><span style={{display:"inline-block",width:10,height:10,background:C.navy,borderRadius:2,marginRight:4}}/>Centralt listad (500 butiker)</span>
-          </div>
-        </Card>
-
-        {/* Kassaflödespanel */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:14}}>
-          <Card>
-            <Lbl>Kassaflöde per månad</Lbl>
+          {/* RESULTATRÄKNING */}
+          <Card style={{marginBottom:14}}>
+            <Lbl>Resultaträkning</Lbl>
             <div style={{overflowX:"auto",marginTop:8}}>
-              <table style={{width:"100%",borderCollapse:"collapse",fontSize:10,fontFamily:"system-ui"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
                 <thead><tr style={{borderBottom:"2px solid "+C.red}}>
-                  {["Månad","Proj. in","Proj. ut","Manuell in","Manuell ut","Saldo"].map(h=><th key={h} style={{textAlign:"left",padding:"5px 6px",fontWeight:700,fontSize:9,textTransform:"uppercase",letterSpacing:"0.03em"}}>{h}</th>)}
+                  <th style={{textAlign:"left",padding:"6px 8px",fontSize:9,textTransform:"uppercase",fontWeight:700}}>Post</th>
+                  {YEARS.map(y=><th key={y} style={{textAlign:"right",padding:"6px 8px",fontSize:9,textTransform:"uppercase",fontWeight:700}}>{y}</th>)}
                 </tr></thead>
                 <tbody>
-                  {balances.map((b,i)=>(
-                    <tr key={i} style={{borderBottom:"1px solid #E8E2DA",background:b.balance<0?"#FFF0F0":b.isCentral?"#F0F4FF":"transparent"}}>
-                      <td style={{padding:"5px 6px",fontWeight:600,color:b.isCentral?C.navy:C.dark}}>{b.label}</td>
-                      <td style={{padding:"5px 6px",color:C.green}}>{Math.round(b.nsv/1000)}k</td>
-                      <td style={{padding:"5px 6px",color:C.red}}>{Math.round(b.totalCost/1000)}k</td>
-                      <td style={{padding:"5px 6px"}}>
-                        <input type="number" placeholder="0" value={(cfByMonth[i]||[]).filter(c=>c.type==="in").reduce((s,c)=>s+(+c.amount||0),0)||""}
-                          onChange={e=>{const v=+e.target.value;setCashflows(p=>{const nxt=p.filter(c=>!(c.month===i&&c.type==="in"&&c.auto));if(v>0)nxt.push({month:i,type:"in",amount:v,label:"Manuell",auto:true});return nxt;})}}
-                          style={{width:55,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"right"}}/>
-                      </td>
-                      <td style={{padding:"5px 6px"}}>
-                        <input type="number" placeholder="0" value={(cfByMonth[i]||[]).filter(c=>c.type==="out").reduce((s,c)=>s+(+c.amount||0),0)||""}
-                          onChange={e=>{const v=+e.target.value;setCashflows(p=>{const nxt=p.filter(c=>!(c.month===i&&c.type==="out"&&c.auto));if(v>0)nxt.push({month:i,type:"out",amount:v,label:"Manuell",auto:true});return nxt;})}}
-                          style={{width:55,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"right"}}/>
-                      </td>
-                      <td style={{padding:"5px 6px",fontWeight:700,color:b.balance<0?C.red:b.balance>100000?C.green:C.dark}}>{Math.round(b.balance/1000)}k</td>
-                    </tr>
-                  ))}
+                  <tr style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"6px 8px",color:"#555"}}>Total NSV (kr)</td>
+                    {nsv.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"right"}}>{fk(v)}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"6px 8px",color:"#555"}}>Total COGS (kr)</td>
+                    {cogs.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"right",color:"#888"}}>{fk(v)}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"2px solid "+C.navy,background:"#EEF2FF"}}>
+                    <td style={{padding:"7px 8px",fontWeight:700,color:C.navy}}>Bruttovinst (kr)</td>
+                    {gross.map((v,i)=><td key={i} style={{padding:"7px 8px",textAlign:"right",fontWeight:700,color:v>0?C.navy:C.red}}>{fk(v)}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"6px 8px",color:"#555"}}>Bruttomarginal</td>
+                    {gross.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"right",color:nsv[i]>0&&v/nsv[i]>=0.3?C.green:"#888"}}>{nsv[i]>0?fp(v/nsv[i]):"—"}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"6px 8px",color:"#555"}}>Fasta kostnader (kr)</td>
+                    {DATA.fixed.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"right",color:"#888"}}>{fk(v)}</td>)}
+                  </tr>
+                  <tr style={{background:C.dark}}>
+                    <td style={{padding:"8px 8px",fontWeight:700,color:"#fff"}}>Rörelseresultat (kr)</td>
+                    {result.map((v,i)=><td key={i} style={{padding:"8px 8px",textAlign:"right",fontWeight:700,color:v>=0?"#4ade80":"#fca5a5",fontSize:13}}>{fk(v)}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"1px solid #E8E2DA",background:C.cream}}>
+                    <td style={{padding:"6px 8px",color:"#555"}}>Rörelsemarginal</td>
+                    {result.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"right",fontWeight:600,color:v>=0?C.green:C.red}}>{nsv[i]>0?fp(v/nsv[i]):"—"}</td>)}
+                  </tr>
+                  <tr>
+                    <td style={{padding:"6px 8px",fontStyle:"italic",color:"#888"}}>Vinst / förlust</td>
+                    {result.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"center"}}>
+                      <span style={{fontSize:10,padding:"2px 8px",borderRadius:10,background:v>=0?"#D4EDDA":"#FFE0E0",fontWeight:700,color:v>=0?C.green:C.red}}>{v>=0?"VINST ✓":"Förlust"}</span>
+                    </td>)}
+                  </tr>
                 </tbody>
               </table>
             </div>
           </Card>
 
-          <div style={{display:"flex",flexDirection:"column",gap:12}}>
-            {/* Kostnadsfördelning */}
-            <Card>
-              <Lbl>Kostnadskategorier — månad 1</Lbl>
-              <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
-                {[
-                  {l:"COGS (DVH)",v:balances[0]?.cogsDvh||0,c:C.red},
-                  {l:"COGS (B2B)",v:balances[0]?.cogsB2b||0,c:"#8B1A1E"},
-                  {l:"Förpackningar",v:balances[0]?.pkgCost||0,c:"#B85042"},
-                  {l:"Logistik",v:balances[0]?.logistik||0,c:C.navy},
-                  {l:"Trade marketing",v:balances[0]?.tradeMarketing||0,c:"#2C5F2D"},
-                  {l:"Fasta kostnader",v:balances[0]?.fixed||0,c:"#888"},
-                ].map(row=>{
-                  const total=balances[0]?.totalCost||1;
-                  return(
-                    <div key={row.l}>
-                      <div style={{display:"flex",justifyContent:"space-between",fontSize:10,fontFamily:"system-ui",marginBottom:2}}>
-                        <span>{row.l}</span><span style={{fontWeight:700}}>{Math.round(row.v/1000)}k kr</span>
-                      </div>
-                      <MiniBar value={row.v} max={total} color={row.c}/>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
+          {/* KAPITALANALYS */}
+          <Card style={{marginBottom:14}}>
+            <Lbl>Kapitalbehov & kassaflöde</Lbl>
+            <div style={{overflowX:"auto",marginTop:8}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
+                <thead><tr style={{borderBottom:"2px solid "+C.red}}>
+                  <th style={{textAlign:"left",padding:"6px 8px",fontSize:9,textTransform:"uppercase",fontWeight:700}}>Post</th>
+                  {YEARS.map(y=><th key={y} style={{textAlign:"right",padding:"6px 8px",fontSize:9,textTransform:"uppercase",fontWeight:700}}>{y}</th>)}
+                </tr></thead>
+                <tbody>
+                  <tr style={{borderBottom:"1px solid #E8E2DA",background:"#FFE0E0"}}>
+                    <td style={{padding:"6px 8px",color:C.red,fontWeight:600}}>Rörelseunderskott att täcka</td>
+                    {underskott.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"right",fontWeight:700,color:v>0?C.red:C.green}}>{v>0?fk(v):"—"}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"1px solid #E8E2DA",background:"#FFF3CD"}}>
+                    <td style={{padding:"6px 8px",color:"#856404",fontWeight:600}}>⚠ Kundfordringar att finansiera</td>
+                    {DATA.kundfod.map((v,i)=><td key={i} style={{padding:"6px 8px",textAlign:"right",color:v>0?"#856404":"#aaa",fontWeight:v>0?700:400}}>{v>0?fk(v):"—"}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"2px solid "+C.dark,background:C.dark}}>
+                    <td style={{padding:"7px 8px",fontWeight:700,color:"#fff"}}>Totalt minimibehov</td>
+                    {totMin.map((v,i)=><td key={i} style={{padding:"7px 8px",textAlign:"right",fontWeight:700,color:"#fff"}}>{v>0?fk(v):"—"}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"1px solid #E8E2DA",background:"#D4EDDA"}}>
+                    <td style={{padding:"7px 8px",fontWeight:700,color:C.green}}>Rekommenderat externt kapital</td>
+                    {DATA.extcap.map((v,i)=><td key={i} style={{padding:"7px 8px",textAlign:"right",fontWeight:700,color:C.green,fontSize:13}}>{fk(v)}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"5px 8px",color:"#555",fontSize:10}}>→ Täcker underskott & kundfordringar</td>
+                    {tackUnd.map((v,i)=><td key={i} style={{padding:"5px 8px",textAlign:"right",color:"#888"}}>{fk(v)}</td>)}
+                  </tr>
+                  <tr style={{borderBottom:"2px solid "+C.navy,background:"#D4EDDA"}}>
+                    <td style={{padding:"5px 8px",color:C.green,fontSize:10,fontWeight:600}}>→ Fritt till tillväxt & rörelsekapital</td>
+                    {tillTillv.map((v,i)=><td key={i} style={{padding:"5px 8px",textAlign:"right",fontWeight:700,color:C.green}}>{v>0?fk(v):"—"}</td>)}
+                  </tr>
+                  <tr style={{background:C.navy}}>
+                    <td style={{padding:"8px 8px",fontWeight:700,color:"#fff"}}>Kassa efter år (ackumulerat)</td>
+                    {kassa.map((v,i)=><td key={i} style={{padding:"8px 8px",textAlign:"right",fontWeight:700,color:v>=0?"#4ade80":"#fca5a5",fontSize:13}}>{fk(v)}</td>)}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </Card>
 
-            {/* Kapitalvarning */}
-            {minBalance<0&&<div style={{background:"#FFF0F0",border:"1px solid #F5C6C6",borderRadius:6,padding:"12px 14px"}}>
-              <div style={{fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",color:C.red,fontFamily:"system-ui",fontWeight:700,marginBottom:4}}>Kapitalbehov</div>
-              <div style={{fontFamily:"system-ui",fontSize:12,color:"#721C24",lineHeight:1.6}}>
-                Kassan beräknas gå minus med <b>{Math.round(Math.abs(minBalance)/1000)} kkr</b>.<br/>
-                Säkra kapital innan central listning.<br/>
-                Mål: 2,5–5 Mkr för 2027.
-              </div>
-            </div>}
-            {minBalance>=0&&<div style={{background:"#D4EDDA",border:"1px solid #C3E6CB",borderRadius:6,padding:"12px 14px"}}>
-              <div style={{fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",color:"#155724",fontFamily:"system-ui",fontWeight:700,marginBottom:4}}>Kassaflöde OK</div>
-              <div style={{fontFamily:"system-ui",fontSize:12,color:"#155724",lineHeight:1.6}}>Prognosen visar positivt kassaflöde hela perioden med nuvarande inställningar.</div>
-            </div>}
-          </div>
-        </div>
-
-        {/* Manuella poster */}
-        <Card>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <Lbl>Manuella transaktioner</Lbl>
-            <Btn onClick={()=>setCashflows(p=>[...p,{id:`CF-${Date.now()}`,month:0,type:"in",label:"",amount:"",auto:false}])}>+ Lägg till</Btn>
-          </div>
-          <p style={{fontFamily:"system-ui",fontSize:11,color:"#aaa",marginBottom:10}}>Kapitalinjektioner, investeringar, lån, engångskostnader etc.</p>
-          {cashflows.filter(c=>!c.auto).length===0&&<div style={{textAlign:"center",color:"#ccc",fontFamily:"system-ui",fontSize:12,padding:16}}>Inga manuella poster ännu.</div>}
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
-            {cashflows.filter(c=>!c.auto).map((cf,i)=>{
-              const realIdx=cashflows.findIndex(x=>x===cf);
-              return(
-                <div key={cf.id||i} style={{display:"flex",gap:8,alignItems:"center",padding:"8px 10px",background:C.cream,borderRadius:5}}>
-                  <select value={cf.month} onChange={e=>{const u=[...cashflows];u[realIdx]={...u[realIdx],month:+e.target.value};setCashflows(u)}} style={{padding:"5px 8px",borderRadius:4,border:"1px solid "+C.border,fontSize:11,fontFamily:"system-ui",background:"#fff"}}>
-                    {balances.map((b,mi)=><option key={mi} value={mi}>{b.label}</option>)}
-                  </select>
-                  <select value={cf.type} onChange={e=>{const u=[...cashflows];u[realIdx]={...u[realIdx],type:e.target.value};setCashflows(u)}} style={{padding:"5px 8px",borderRadius:4,border:"1px solid "+C.border,fontSize:11,fontFamily:"system-ui",background:cf.type==="in"?"#D4EDDA":"#FFE0E0",color:cf.type==="in"?"#155724":"#721C24",fontWeight:700}}>
-                    <option value="in">Inbetalning</option>
-                    <option value="out">Utbetalning</option>
-                  </select>
-                  <input value={cf.label} onChange={e=>{const u=[...cashflows];u[realIdx]={...u[realIdx],label:e.target.value};setCashflows(u)}} placeholder="Beskrivning..." style={{flex:1,padding:"5px 8px",borderRadius:4,border:"1px solid "+C.border,fontSize:11,fontFamily:"system-ui"}}/>
-                  <input type="number" value={cf.amount} onChange={e=>{const u=[...cashflows];u[realIdx]={...u[realIdx],amount:+e.target.value};setCashflows(u)}} placeholder="kr" style={{width:80,padding:"5px 8px",borderRadius:4,border:"1px solid "+C.border,fontSize:11,fontFamily:"system-ui",textAlign:"right",fontWeight:700,color:cf.type==="in"?C.green:C.red}}/>
-                  <Btn ghost onClick={()=>setCashflows(p=>p.filter((_,j)=>j!==realIdx))} style={{padding:"4px 8px",fontSize:11}}>×</Btn>
+          {/* KAPITALPLAN */}
+          <Card>
+            <Lbl>Kapitalplan — varför dessa belopp?</Lbl>
+            <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
+              {[
+                {year:"2026 — 1,7 Mkr",bg:"#D4EDDA",fc:C.green,text:"Täcker hela budgeten: lön (360k), sociala avgifter (180k), lokalhyra (138k), SOME (160k), förpackningar, produktion, engångskostnader. Rörelseunderskott ~1,7 Mkr. Extra ~200k = buffert."},
+                {year:"2027 — 3 Mkr",bg:"#FFE0E0",fc:C.red,text:"Underskott ~980k (V7) / ~1,2 Mkr (V16) måste täckas. Kundfordringar ~1,5 Mkr. Resten = kampanjkapital, säljteam, lager. KRITISKT: pengarna måste finnas INNAN lansering."},
+                {year:"2028 — 2 Mkr",bg:"#FFF3CD",fc:"#856404",text:"Du är lönsam (+2,9 Mkr) men kundfordringar ~1 Mkr kan vara utestående. Extra kapital accelererar skalning till 850 butiker och ger buffert om tillväxten går långsammare."},
+                {year:"2029 — 5-10 Mkr",bg:"#EEF2FF",fc:C.navy,text:"Nordenexpansion + ev. semiautomatiserad produktion (3-8 Mkr). Kundfordringar ~6 Mkr utestående. Nettovinst ~15 Mkr täcker driften men inte investeringarna. Ev. checkkrediter hos bank."},
+                {year:"2030 — 5 Mkr",bg:"#D4EDDA",fc:C.green,text:"Nordic scale — lokal expertis, marknadsföring i nya länder. Vid det laget är verksamheten kraftigt lönsam och kan delvis självfinansiera expansion."},
+                {year:"⚠ Kundfordrings-fällan",bg:"#FFE0E0",fc:C.red,text:"ICA/Coop/Axfood betalar 30-60 dagar efter leverans. Du måste ha betalat produktion & förpackningar INNAN du får betalt. Ju snabbare du växer, desto mer kapital binds. Planera för detta redan nu!"},
+              ].map((x,i)=>(
+                <div key={i} style={{display:"flex",gap:10,padding:"10px 12px",background:x.bg,borderRadius:5}}>
+                  <div style={{fontWeight:700,fontSize:11,fontFamily:"system-ui",color:x.fc,minWidth:140,flexShrink:0}}>{x.year}</div>
+                  <div style={{fontSize:11,fontFamily:"system-ui",color:"#333",lineHeight:1.6}}>{x.text}</div>
                 </div>
-              );
-            })}
-          </div>
-        </Card>
-      </div>);
-    })()}
+              ))}
+            </div>
+          </Card>
+        </div>);
+      })()}
+    </div>)}
 
     {/* ═══ AI-ANALYS ═══ */}
     {tab==="ai"&&(()=>{
