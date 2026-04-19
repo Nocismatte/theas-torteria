@@ -65,20 +65,21 @@ const KS = { sales: "tt3-s", tasks: "tt3-t", orders: "tt3-o", fc: "tt3-f", demo:
 const BAKERY_INFO = { name: "Konditori Katarina", city: "Malmö", contact: "", phone: "", email: "", leadtime: 7, moq: 100 };
 const PKG_INFO = { name: "Kartongbolaget", city: "Helsingborg", contact: "", phone: "", email: "", leadtime: 14, moq_150: 500, moq_400: 250 };
 const INIT_TASKS = [
-  { id:"T01", task:"Avtal legotillverkare", cat:"Prod", who:"Thea", due:"2026-05-15", p:1, st:"Pågår" },
-  { id:"T02", task:"Förpackningsdesign 7 sorter", cat:"Design", who:"Pontus", due:"2026-05-01", p:1, st:"Pågår" },
-  { id:"T03", task:"Beställ förpackningar (150g+400g)", cat:"Förp", who:"Thea", due:"2026-05-20", p:1, st:"Ej påbörjad" },
-  { id:"T04", task:"Boka 10 pilotbutiker", cat:"Sälj", who:"Thea", due:"2026-05-30", p:1, st:"Pågår" },
-  { id:"T05", task:"Avtal Polfärskt", cat:"Logistik", who:"Thea", due:"2026-05-15", p:1, st:"Ej påbörjad" },
-  { id:"T06", task:"Äkta Vara + Från Sverige", cat:"Cert", who:"Thea", due:"2026-06-01", p:2, st:"Pågår" },
-  { id:"T07", task:"Demo-material & POS", cat:"Marknad", who:"Thea", due:"2026-06-01", p:1, st:"Ej påbörjad" },
-  { id:"T08", task:"Starta demo i butik", cat:"Sälj", who:"Thea", due:"2026-06-01", p:1, st:"Ej påbörjad" },
-  { id:"T09", task:"Listning ICA centralt", cat:"Sälj", who:"Thea", due:"2026-10-01", p:1, st:"Ej påbörjad" },
-  { id:"T10", task:"Listning Coop centralt", cat:"Sälj", who:"Thea", due:"2026-10-01", p:1, st:"Ej påbörjad" },
-  { id:"T11", task:"Listning Axfood centralt", cat:"Sälj", who:"Thea", due:"2026-10-01", p:1, st:"Ej påbörjad" },
-  { id:"T12", task:"Business case presentation", cat:"Sälj", who:"Thea", due:"2026-10-15", p:1, st:"Ej påbörjad" },
-  { id:"T13", task:"Säkra kapital 2027 (2,5-5 Mkr)", cat:"Finans", who:"Thea", due:"2026-10-30", p:1, st:"Ej påbörjad" },
-  { id:"T14", task:"EDI-setup Pagero/Inexchange", cat:"IT", who:"Thea", due:"2027-01-15", p:2, st:"Ej påbörjad" },
+  { id:"T01", task:"Avtal legotillverkare (Konditori Katarina)", cat:"Prod", who:"Thea", due:"2026-05-15", p:"A", st:"Pågår" },
+  { id:"T02", task:"Förpackningsdesign 7 sorter", cat:"Design", who:"Thea", due:"2026-05-01", p:"A", st:"Pågår" },
+  { id:"T03", task:"Beställ förpackningar (150g+400g) — Kartongbolaget", cat:"Förp", who:"Thea", due:"2026-05-20", p:"A", st:"Ej påbörjad" },
+  { id:"T04", task:"Boka 13 pilotbutiker", cat:"Sälj", who:"Thea", due:"2026-05-30", p:"A", st:"Pågår" },
+  { id:"T05", task:"Avtal Polfärskt (logistik & distribution)", cat:"Logistik", who:"Thea", due:"2026-05-15", p:"A", st:"Ej påbörjad" },
+  { id:"T06", task:"Starta demo i butik (tors/fre/lör)", cat:"Sälj", who:"Thea", due:"2026-06-01", p:"A", st:"Ej påbörjad" },
+  { id:"T07", task:"Business case presentation ICA/Coop/Axfood", cat:"Sälj", who:"Thea", due:"2026-10-15", p:"A", st:"Ej påbörjad" },
+  { id:"T08", task:"Säkra kapital 2027 (1,7-5 Mkr)", cat:"Finans", who:"Thea", due:"2026-10-30", p:"A", st:"Ej påbörjad" },
+  { id:"T09", task:"Äkta Vara + Från Sverige certifiering", cat:"Cert", who:"Thea", due:"2026-06-01", p:"B", st:"Pågår" },
+  { id:"T10", task:"Demo-material & POS-material", cat:"Marknad", who:"Thea", due:"2026-06-01", p:"B", st:"Ej påbörjad" },
+  { id:"T11", task:"Listning ICA centralt", cat:"Sälj", who:"Thea", due:"2026-10-01", p:"B", st:"Ej påbörjad" },
+  { id:"T12", task:"Listning Coop centralt", cat:"Sälj", who:"Thea", due:"2026-10-01", p:"B", st:"Ej påbörjad" },
+  { id:"T13", task:"Listning Axfood centralt", cat:"Sälj", who:"Thea", due:"2026-10-01", p:"B", st:"Ej påbörjad" },
+  { id:"T14", task:"EDI-setup Pagero/Inexchange", cat:"IT", who:"Thea", due:"2027-01-15", p:"C", st:"Ej påbörjad" },
+  { id:"T15", task:"GS1 GLN-nummer + EAN/GTIN-koder", cat:"IT", who:"Thea", due:"2027-01-01", p:"C", st:"Ej påbörjad" },
 ];
 
 function ld(k,f){try{const r=localStorage.getItem(k);return r?JSON.parse(r):f}catch{return f}}
@@ -254,6 +255,8 @@ export default function App(){
   const [aiInput,setAiInput]=useState("");
   const [aiLoading,setAiLoading]=useState(false);
   const [aiInitDone,setAiInitDone]=useState(false);
+  const [anthropicKey,setAnthropicKey]=useState(()=>localStorage.getItem("tt3-anthropic-key")||"");
+  const [inventory,setInventory]=useState(()=>ld("tt3-inv",{kakLager:{},forpLager:{}}));
   const chatRef=useRef(null);
   const [tab,setTab]=useState("dashboard");
   const [ch,setCh]=useState("dvh");
@@ -275,6 +278,7 @@ export default function App(){
   useEffect(()=>{sv("tt3-pkinfo",pkgInfo)},[pkgInfo]);
   useEffect(()=>{sv("tt3-fin",finSettings)},[finSettings]);
   useEffect(()=>{sv("tt3-ideas",ideas)},[ideas]);
+  useEffect(()=>{sv("tt3-inv",inventory)},[inventory]);
 
   const gk=(c,w,l,s)=>`${c}-${w}-${l}-${s}`;
   const gv=(c,w,l,s)=>sales[gk(c,w,l,s)]||0;
@@ -311,17 +315,17 @@ export default function App(){
 
   const TABS=[
     {id:"dashboard",label:"Dashboard"},
+    {id:"tasks",label:"To Do"},
     {id:"input",label:"Rapportera"},
     {id:"demo",label:"Demo-schema"},
-    {id:"forecast",label:"Forecast"},
+    {id:"forecast",label:"Forecast & Lager"},
     {id:"orders",label:"Ordrar"},
-    {id:"promo",label:"Sälj & Promo"},
-    {id:"tasks",label:"Projekt"},
-    {id:"pitch",label:"Kedjepitch"},
-    {id:"pilot",label:"Provförsäljning 2026"},
-    {id:"edi",label:"Kedjordrar (EDI)"},
     {id:"bakery",label:"Inköp & Produktion"},
     {id:"packaging",label:"Förpackningsorder"},
+    {id:"pitch",label:"Kedjepitch"},
+    {id:"pilot",label:"Provförsäljning 2026"},
+    {id:"promo",label:"Sälj & Promo & Kampanjer"},
+    {id:"edi",label:"Kedjordrar (EDI)"},
     {id:"finance",label:"Kapital & Forecast"},
     {id:"ai",label:"AI-analys"},
     {id:"ideas",label:"Idéer"},
@@ -359,90 +363,155 @@ export default function App(){
     {tab==="dashboard"&&(<div>
       <PageHead title="Översikt." sub="Dashboard"/>
 
-      {/* KPI rad — totalt */}
-      <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:18}}>
+      {/* Rad 1 — KPI:er */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:14}}>
         <KpiCard label="Total försäljning" value={fmt(m.totU)+" st"} sub={`DVH ${fmt(m.dvh.tot)} · B2B ${fmt(m.b2b.tot)}`}/>
         <KpiCard label="Total NSV" value={fk(m.totNSV)} accent="#8B1A1E"/>
         <KpiCard label="Bruttovinst" value={fk(m.totG)} accent={C.green}/>
-        <KpiCard label="UPW (DVH)" value={m.dvh.upw.toFixed(1)} sub="Units/vecka/SKU/butik" accent={m.dvh.upw>=7?C.green:C.red}/>
+        <KpiCard label="UPW (DVH)" value={m.dvh.upw.toFixed(1)} sub={m.dvh.upw>=7?"✓ Över mål":"Mål: 7"} accent={m.dvh.upw>=7?C.green:C.red}/>
         <KpiCard label="V/V tillväxt" value={m.dvh.aw>1?fp(m.dvh.avgGr):"—"} accent={m.dvh.avgGr>0?C.green:"#B85042"}/>
         <KpiCard label="Aktiva ordrar" value={orders.filter(o=>o.status!=="Betald"&&o.status!=="Levererad").length+" st"} accent={C.navy}/>
       </div>
 
       {/* Veckotrend */}
       <Card style={{marginBottom:14}}>
-        <Lbl>Veckotrend — DVH försäljning</Lbl>
-        <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:10}}>
-          {WEEKS.map(w=>{const v=m.dvh.wk[w]||0;const h=m.dvh.mxW>0?v/m.dvh.mxW*88:0;return(<div key={w} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+        <Lbl>Veckotrend — DVH försäljning (12 veckor)</Lbl>
+        <div style={{display:"flex",alignItems:"flex-end",gap:4,height:80,marginTop:10}}>
+          {WEEKS.map(w=>{const v=m.dvh.wk[w]||0;const h=m.dvh.mxW>0?v/m.dvh.mxW*72:0;return(<div key={w} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
             <div style={{fontSize:7,color:"#aaa",fontFamily:"system-ui"}}>{v>0?v:""}</div>
-            <div style={{width:"100%",height:h,minHeight:v>0?2:0,background:C.red,borderRadius:"2px 2px 0 0",transition:"height 0.3s"}}/>
+            <div style={{width:"100%",height:h,minHeight:v>0?2:0,background:C.red,borderRadius:"2px 2px 0 0"}}/>
             <div style={{fontSize:7,color:"#bbb",fontFamily:"system-ui"}}>v{w}</div>
           </div>)})}
         </div>
       </Card>
 
-      {/* Tre kolumner: Top SKU, Top butiker, Kommande uppgifter */}
+      {/* Rad 2 — 3 kolumner */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:14}}>
-        <Card>
-          <Lbl>Top SKU</Lbl>
-          <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:7}}>
-            {SKUS.slice().sort((a,b)=>(m.combo[b.id]||0)-(m.combo[a.id]||0)).slice(0,5).map(sk=>(<div key={sk.id}>
-              <div style={{display:"flex",justifyContent:"space-between",fontSize:11,fontFamily:"system-ui",marginBottom:2}}><span>{sk.name}</span><span style={{fontWeight:700}}>{fmt(m.combo[sk.id])}</span></div>
-              <MiniBar value={m.combo[sk.id]} max={Math.max(...Object.values(m.combo),1)}/>
-            </div>))}
-          </div>
-        </Card>
-        <Card>
-          <Lbl>Top butiker (DVH)</Lbl>
-          <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:7}}>
-            {STORES.slice().sort((a,b)=>(m.dvh.store[b.id]||0)-(m.dvh.store[a.id]||0)).slice(0,5).map(st=>(<div key={st.id}>
-              <div style={{display:"flex",justifyContent:"space-between",fontSize:11,fontFamily:"system-ui",marginBottom:2}}><span style={{fontSize:10}}>{st.name}</span><span style={{fontWeight:700}}>{fmt(m.dvh.store[st.id])}</span></div>
-              <MiniBar value={m.dvh.store[st.id]} max={m.dvh.mxSt} color={C.navy}/>
-            </div>))}
-          </div>
-        </Card>
+        {/* Top SKU */}
         <Card>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
-            <Lbl>To-do</Lbl>
-            <button onClick={()=>setTab("tasks")} style={{fontSize:9,fontFamily:"system-ui",color:C.red,fontWeight:700,background:"none",border:"none",cursor:"pointer",letterSpacing:"0.04em",textTransform:"uppercase"}}>Visa alla</button>
+            <Lbl>Top SKU</Lbl>
+            <button onClick={()=>setTab("input")} style={{fontSize:9,fontFamily:"system-ui",color:C.red,fontWeight:700,background:"none",border:"none",cursor:"pointer"}}>Rapportera →</button>
           </div>
-          <div style={{display:"flex",flexDirection:"column",gap:5}}>
-            {tasks.filter(t=>t.st!=="Klar").sort((a,b)=>a.p-b.p||(a.due||"").localeCompare(b.due||"")).slice(0,6).map(t=>(
-              <div key={t.id} style={{display:"flex",alignItems:"flex-start",gap:7,padding:"6px 8px",background:C.cream,borderRadius:4}}>
-                <div style={{width:8,height:8,borderRadius:2,marginTop:3,flexShrink:0,background:t.st==="Pågår"?"#FFC107":C.border}}/>
+          {SKUS.slice().sort((a,b)=>(m.combo[b.id]||0)-(m.combo[a.id]||0)).slice(0,5).map(sk=>(<div key={sk.id} style={{marginBottom:5}}>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:11,fontFamily:"system-ui",marginBottom:2}}><span>{sk.name}</span><span style={{fontWeight:700}}>{fmt(m.combo[sk.id])}</span></div>
+            <MiniBar value={m.combo[sk.id]} max={Math.max(...Object.values(m.combo),1)}/>
+          </div>))}
+        </Card>
+
+        {/* Demo-status */}
+        <Card>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+            <Lbl>Demo-status</Lbl>
+            <button onClick={()=>setTab("demo")} style={{fontSize:9,fontFamily:"system-ui",color:C.red,fontWeight:700,background:"none",border:"none",cursor:"pointer"}}>Visa →</button>
+          </div>
+          {(()=>{
+            const demoWeeks=WEEKS.filter(w=>demoNotes[`w${w}_store`]);
+            const totalSold=WEEKS.reduce((s,w)=>s+parseInt(demoNotes[`w${w}_sold`]||0),0);
+            const totalSamples=WEEKS.reduce((s,w)=>s+parseInt(demoNotes[`w${w}_samples`]||0),0);
+            const avgConv=totalSamples>0?Math.round(totalSold/totalSamples*100):0;
+            const bestWeek=WEEKS.filter(w=>parseInt(demoNotes[`w${w}_samples`]||0)>0).sort((a,b)=>{
+              const ca=parseInt(demoNotes[`w${a}_sold`]||0)/Math.max(parseInt(demoNotes[`w${a}_samples`]||1),1);
+              const cb=parseInt(demoNotes[`w${b}_sold`]||0)/Math.max(parseInt(demoNotes[`w${b}_samples`]||1),1);
+              return cb-ca;
+            })[0];
+            return(<div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,fontFamily:"system-ui"}}><span style={{color:"#888"}}>Demo-veckor</span><b>{demoWeeks.length}/{WEEKS.length}</b></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,fontFamily:"system-ui"}}><span style={{color:"#888"}}>Totalt sålda</span><b>{totalSold} st</b></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,fontFamily:"system-ui"}}><span style={{color:"#888"}}>Smakprov</span><b>{totalSamples} st</b></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,fontFamily:"system-ui"}}><span style={{color:"#888"}}>Snitt konvertering</span><b style={{color:avgConv>=20?C.green:avgConv>=10?"#B85042":C.red}}>{avgConv}%</b></div>
+              {bestWeek&&<div style={{fontSize:10,fontFamily:"system-ui",color:"#aaa"}}>Bäst: v{bestWeek} ({demoNotes[`w${bestWeek}_store`]?STORES.find(s=>s.id===demoNotes[`w${bestWeek}_store`])?.name:"?"})</div>}
+            </div>);
+          })()}
+        </Card>
+
+        {/* To Do A-prio */}
+        <Card>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+            <Lbl>To Do — Prio A</Lbl>
+            <button onClick={()=>setTab("tasks")} style={{fontSize:9,fontFamily:"system-ui",color:C.red,fontWeight:700,background:"none",border:"none",cursor:"pointer"}}>Visa alla →</button>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            {tasks.filter(t=>t.p==="A"&&t.st!=="Klar").slice(0,5).map(t=>(
+              <div key={t.id} style={{display:"flex",alignItems:"flex-start",gap:6,padding:"5px 7px",background:C.cream,borderRadius:4}}>
+                <div style={{width:7,height:7,borderRadius:2,marginTop:3,flexShrink:0,background:t.st==="Pågår"?"#FFC107":C.border}}/>
                 <div style={{flex:1}}>
                   <div style={{fontSize:11,fontFamily:"system-ui",fontWeight:600,lineHeight:1.3}}>{t.task}</div>
-                  <div style={{fontSize:9,color:"#bbb",fontFamily:"system-ui",marginTop:1}}>{t.due||"Inget datum"}</div>
+                  <div style={{fontSize:9,color:"#bbb",fontFamily:"system-ui"}}>{t.due||"Inget datum"}</div>
                 </div>
-                <Badge bg={t.p===1?C.red:"#aaa"}>P{t.p}</Badge>
+              </div>
+            ))}
+            {tasks.filter(t=>t.p==="A"&&t.st!=="Klar").length===0&&<div style={{fontSize:11,fontFamily:"system-ui",color:"#ccc"}}>Inga A-uppgifter kvar! 🎉</div>}
+          </div>
+        </Card>
+      </div>
+
+      {/* Rad 3 — Lager + Kampanjer + Ordrar */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:14}}>
+
+        {/* Lagerstatus snabb */}
+        <Card>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+            <Lbl>Lagerstatus</Lbl>
+            <button onClick={()=>setTab("forecast")} style={{fontSize:9,fontFamily:"system-ui",color:C.red,fontWeight:700,background:"none",border:"none",cursor:"pointer"}}>Visa →</button>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            {SKUS.slice(0,5).map(sk=>{
+              const kakLager=parseInt(inventory.kakLager?.[sk.id]||0);
+              const avg=m.fcAvg[sk.id]||0;
+              const wl=avg>0?(kakLager/avg).toFixed(1):"—";
+              const low=parseFloat(wl)<2&&wl!=="—";
+              return(<div key={sk.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:11,fontFamily:"system-ui",padding:"3px 0"}}>
+                <span style={{color:low?C.red:"#555"}}>{sk.name}</span>
+                <span style={{fontWeight:700,color:low?C.red:"#888"}}>{kakLager>0?`${kakLager} st`:"—"}{low&&" ⚠"}</span>
+              </div>);
+            })}
+          </div>
+        </Card>
+
+        {/* Kommande kampanjer */}
+        <Card>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+            <Lbl>Kommande kampanjer</Lbl>
+            <button onClick={()=>setTab("promo")} style={{fontSize:9,fontFamily:"system-ui",color:C.red,fontWeight:700,background:"none",border:"none",cursor:"pointer"}}>Visa →</button>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            {promos.filter(p=>p.deadline&&p.status!=="Klar").sort((a,b)=>a.deadline.localeCompare(b.deadline)).slice(0,4).map((p,i)=>{
+              const today=new Date().toISOString().slice(0,10);
+              const daysLeft=Math.ceil((new Date(p.deadline)-new Date(today))/864e5);
+              return(<div key={i} style={{display:"flex",justifyContent:"space-between",fontSize:11,fontFamily:"system-ui",padding:"3px 0",borderBottom:"1px solid #E8E2DA"}}>
+                <span style={{color:daysLeft<=7?C.red:"#555",fontWeight:daysLeft<=7?700:400}}>{p.name||p.id}</span>
+                <span style={{color:daysLeft<=7?C.red:"#888",fontWeight:700}}>{daysLeft}d</span>
+              </div>);
+            })}
+            {promos.filter(p=>p.deadline&&p.status!=="Klar").length===0&&<div style={{fontSize:11,fontFamily:"system-ui",color:"#ccc"}}>Inga kampanjer planerade.</div>}
+          </div>
+        </Card>
+
+        {/* Senaste ordrar */}
+        <Card>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+            <Lbl>Senaste ordrar</Lbl>
+            <button onClick={()=>setTab("orders")} style={{fontSize:9,fontFamily:"system-ui",color:C.red,fontWeight:700,background:"none",border:"none",cursor:"pointer"}}>Visa →</button>
+          </div>
+          {orders.length===0&&<div style={{fontSize:11,fontFamily:"system-ui",color:"#ccc"}}>Inga ordrar ännu.</div>}
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            {orders.slice(0,4).map((o,i)=>(
+              <div key={i} style={{display:"flex",gap:8,alignItems:"center",fontSize:11,fontFamily:"system-ui",padding:"3px 0",borderBottom:"1px solid #E8E2DA"}}>
+                <span style={{fontWeight:700,color:C.red,minWidth:45,fontSize:10}}>{o.id}</span>
+                <span style={{flex:1,fontSize:10}}>{o.customer}</span>
+                <span style={{fontSize:9,padding:"1px 5px",borderRadius:3,background:o.status==="Levererad"||o.status==="Betald"?"#D4EDDA":"#FFF3CD"}}>{o.status}</span>
               </div>
             ))}
           </div>
         </Card>
       </div>
 
-      {/* Ordrar & Export rad */}
-      <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:12,alignItems:"start"}}>
-        <Card>
-          <Lbl>Senaste ordrar</Lbl>
-          {orders.length===0&&<div style={{fontSize:11,fontFamily:"system-ui",color:"#ccc",marginTop:8}}>Inga ordrar ännu.</div>}
-          <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:8}}>
-            {orders.slice(0,4).map((o,i)=>(
-              <div key={i} style={{display:"flex",gap:10,alignItems:"center",padding:"5px 8px",background:C.cream,borderRadius:4,fontSize:11,fontFamily:"system-ui"}}>
-                <span style={{fontWeight:700,color:C.red,minWidth:50}}>{o.id}</span>
-                <span style={{flex:1}}>{o.customer}</span>
-                <Badge bg={o.channel==="dvh"?C.red:C.navy}>{o.channel==="dvh"?"150g":"400g"}</Badge>
-                <span style={{fontWeight:700}}>{o.qty} st</span>
-                <span style={{fontSize:9,padding:"2px 6px",borderRadius:3,background:o.status==="Betald"?"#D4EDDA":o.status==="Fakturerad"?"#FFF3CD":"#fff",border:"1px solid #E8E2DA"}}>{o.status}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-        <div style={{display:"flex",flexDirection:"column",gap:8}}>
-          <Btn ghost onClick={exportCSV}>Exportera CSV</Btn>
-          <Btn ghost onClick={()=>fileRef.current?.click()}>Importera CSV</Btn>
-          <input ref={fileRef} type="file" accept=".csv" onChange={importCSV} style={{display:"none"}}/>
-        </div>
+      {/* Export */}
+      <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+        <Btn ghost onClick={exportCSV}>Exportera CSV</Btn>
+        <Btn ghost onClick={()=>fileRef.current?.click()}>Importera CSV</Btn>
+        <input ref={fileRef} type="file" accept=".csv" onChange={importCSV} style={{display:"none"}}/>
       </div>
     </div>)}
 
@@ -454,7 +523,7 @@ export default function App(){
       </div>
       <div style={{display:"flex",gap:10,marginBottom:18,flexWrap:"wrap"}}>
         <Sel label="Vecka" value={wk} onChange={v=>setWk(+v)} opts={WEEKS.map(w=>({v:w,l:`Vecka ${w}`}))}/>
-        {ch==="dvh"?<Sel label="Butik" value={loc} onChange={setLoc} opts={STORES.map(s=>({v:s.id,l:s.name}))}/>:<Sel label="Kund" value={b2bC} onChange={setB2bC} opts={B2B_CUST.map(c=>({v:c.id,l:c.name}))}/>}
+        {ch==="dvh"?<Sel label="Butik" value={loc} onChange={setLoc} opts={STORES.map(s=>({v:s.id,l:s.name}))}/>:<div style={{display:"flex",gap:8,flex:1}}><Sel label="Kund" value={b2bC} onChange={setB2bC} opts={B2B_CUST.map(c=>({v:c.id,l:c.name}))}/>{b2bC==="C04"&&<Inp label="Företagsnamn (Övriga B2B)" value={sales[`b2b_comment_${b2bC}`]||""} onChange={v=>setSales(p=>({...p,[`b2b_comment_${b2bC}`]:v}))}/>}</div>}
       </div>
       <Card>
         <div style={{display:"grid",gap:8}}>
@@ -476,137 +545,252 @@ export default function App(){
 
     {/* ═══ DEMO SCHEMA ═══ */}
     {tab==="demo"&&(<div>
-      <PageHead title="Demo-schema & rotation." sub="Demo"/>
-      <p style={{fontFamily:"system-ui",fontSize:12,color:C.muted,margin:"0 0 16px",lineHeight:1.5}}>
-        13 butiker · 12 veckor · 3 dagar/vecka · 2 butiker/dag. Prio 1-butiker (ICA Maxi Högsbo, ICA Focus, ICA Hovås) demoas varannan vecka. Övriga roterar.
+      <PageHead title="Demo-schema." sub="Demo"/>
+      <p style={{fontFamily:"system-ui",fontSize:12,color:C.muted,margin:"0 0 14px",lineHeight:1.5}}>
+        1 butik per vecka · Torsdag, fredag & lördag · Rapportera smakprov & köp för att beräkna konvertering.
       </p>
 
-      {/* Prioritetslista */}
-      <Card style={{marginBottom:14}}>
-        <Lbl>Butiksprioritet</Lbl>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginTop:8}}>
-          {[
-            {prio:1, label:"Prio 1 — Varje demo-runda", color:C.red, stores:STORES.filter(s=>s.prio===1)},
-            {prio:2, label:"Prio 2 — Varannan runda", color:C.navy, stores:STORES.filter(s=>s.prio===2)},
-            {prio:3, label:"Prio 3 — Sista rundorna", color:"#888", stores:STORES.filter(s=>s.prio===3)},
-          ].map(g=>(
-            <div key={g.prio} style={{background:C.cream,borderRadius:5,padding:12,borderTop:"3px solid "+g.color}}>
-              <div style={{fontWeight:700,marginBottom:6,fontSize:11,fontFamily:"system-ui",color:g.color,textTransform:"uppercase",letterSpacing:"0.06em"}}>{g.label}</div>
-              {g.stores.map(s=><div key={s.id} style={{fontSize:12,fontFamily:"system-ui",padding:"3px 0"}}>{s.name} <span style={{color:"#bbb",fontSize:10}}>{s.fmt}</span></div>)}
+      {/* Veckoschema med konverteringsrapportering */}
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
+        {WEEKS.map(w=>{
+          const storeId=demoNotes[`w${w}_store`]||"";
+          const store=STORES.find(s=>s.id===storeId);
+          const samples=parseInt(demoNotes[`w${w}_samples`]||0);
+          const sold=parseInt(demoNotes[`w${w}_sold`]||0);
+          const conv=samples>0?Math.round(sold/samples*100):0;
+          const prioColor=(p)=>p===1?C.red:p===2?C.navy:"#888";
+          return(
+            <div key={w} style={{background:C.card,borderRadius:6,padding:"12px 14px",border:"1px solid #E8E2DA"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+                <div style={{fontFamily:"Georgia,serif",fontSize:16,fontWeight:700,color:C.red,minWidth:32}}>v{w}</div>
+                <select value={storeId} onChange={e=>setDemoNotes(p=>({...p,[`w${w}_store`]:e.target.value}))} style={{padding:"5px 8px",borderRadius:4,border:"1px solid #E8E2DA",fontSize:12,fontFamily:"system-ui",background:"#fff",flex:"1 1 180px"}}>
+                  <option value="">— Välj butik —</option>
+                  {STORES.map(s=><option key={s.id} value={s.id}>{s.name} ({s.fmt})</option>)}
+                </select>
+                {store&&<span style={{fontSize:10,fontFamily:"system-ui",fontWeight:700,color:prioColor(store.prio),whiteSpace:"nowrap"}}>Prio {store.prio}</span>}
+
+                <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                  <div style={{fontSize:10,fontFamily:"system-ui",color:"#888"}}>
+                    Smakprov:
+                    <input type="number" min="0" value={demoNotes[`w${w}_samples`]||""} placeholder="0" onChange={e=>setDemoNotes(p=>({...p,[`w${w}_samples`]:e.target.value}))} style={{width:55,marginLeft:4,padding:"3px 6px",borderRadius:3,border:"1px solid #E8E2DA",fontSize:11,textAlign:"center"}}/>
+                  </div>
+                  <div style={{fontSize:10,fontFamily:"system-ui",color:"#888"}}>
+                    Sålda förp:
+                    <input type="number" min="0" value={demoNotes[`w${w}_sold`]||""} placeholder="0" onChange={e=>setDemoNotes(p=>({...p,[`w${w}_sold`]:e.target.value}))} style={{width:55,marginLeft:4,padding:"3px 6px",borderRadius:3,border:"1px solid #E8E2DA",fontSize:11,textAlign:"center"}}/>
+                  </div>
+                  {samples>0&&(
+                    <div style={{padding:"3px 10px",borderRadius:12,background:conv>=20?"#D4EDDA":conv>=10?"#FFF3CD":"#FFE0E0",fontSize:11,fontFamily:"system-ui",fontWeight:700,color:conv>=20?"#155724":conv>=10?"#856404":"#721C24"}}>
+                      {conv}% konv.
+                    </div>
+                  )}
+                </div>
+                <input value={demoNotes[`w${w}_note`]||""} onChange={e=>setDemoNotes(p=>({...p,[`w${w}_note`]:e.target.value}))} placeholder="Anteckning..." style={{flex:"1 1 140px",padding:"4px 8px",borderRadius:4,border:"1px solid #E8E2DA",fontSize:11,fontFamily:"system-ui"}}/>
+              </div>
+
+              {/* SKU-rapportering per dag */}
+              {storeId&&<div style={{marginTop:10,borderTop:"1px solid #E8E2DA",paddingTop:10}}>
+                <div style={{fontSize:9,fontFamily:"system-ui",fontWeight:700,color:"#aaa",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Sålda per SKU denna vecka</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                  {SKUS.map(sk=>{
+                    const skuVal=demoNotes[`w${w}_sku_${sk.id}`]||"";
+                    return(
+                      <div key={sk.id} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 8px",background:"#fff",borderRadius:4,border:"1px solid #E8E2DA"}}>
+                        <span style={{fontSize:10,fontFamily:"system-ui"}}>{sk.name}</span>
+                        <input type="number" min="0" value={skuVal} placeholder="0" onChange={e=>setDemoNotes(p=>({...p,[`w${w}_sku_${sk.id}`]:e.target.value}))} style={{width:40,border:"1px solid #E8E2DA",borderRadius:3,fontSize:11,padding:"2px 4px",textAlign:"center",fontWeight:700,color:C.red}}/>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>}
             </div>
-          ))}
+          );
+        })}
+      </div>
+
+      {/* Konverteringsöversikt */}
+      <Card style={{marginBottom:14}}>
+        <Lbl>Konverteringsöversikt</Lbl>
+        <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:8}}>
+          {WEEKS.filter(w=>parseInt(demoNotes[`w${w}_samples`]||0)>0).map(w=>{
+            const storeId=demoNotes[`w${w}_store`]||"";
+            const store=STORES.find(s=>s.id===storeId);
+            const samples=parseInt(demoNotes[`w${w}_samples`]||0);
+            const sold=parseInt(demoNotes[`w${w}_sold`]||0);
+            const conv=samples>0?Math.round(sold/samples*100):0;
+            return(
+              <div key={w} style={{background:C.cream,borderRadius:5,padding:"8px 12px",minWidth:120,textAlign:"center"}}>
+                <div style={{fontSize:9,fontFamily:"system-ui",color:"#aaa",marginBottom:2}}>v{w} — {store?.name?.split(" ").slice(-1)[0]||"?"}</div>
+                <div style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:700,color:conv>=20?C.green:conv>=10?"#B85042":C.red}}>{conv}%</div>
+                <div style={{fontSize:9,fontFamily:"system-ui",color:"#bbb"}}>{sold}/{samples} köp/prov</div>
+              </div>
+            );
+          })}
+          {WEEKS.filter(w=>parseInt(demoNotes[`w${w}_samples`]||0)>0).length===0&&<div style={{fontSize:11,fontFamily:"system-ui",color:"#ccc"}}>Inga demo-veckor rapporterade ännu.</div>}
         </div>
       </Card>
 
-      {/* 12-veckors schema */}
-      <Card style={{marginBottom:14}}>
-        <Lbl>12-veckors demo-schema</Lbl>
-        <p style={{fontFamily:"system-ui",fontSize:11,color:"#aaa",margin:"4px 0 10px"}}>Torsdag & fredag eftermiddag/kväll · Lördag förmiddag. <span style={{color:"#B85042"}}>OBS: dubbelkolla tider med butikerna.</span></p>
-        <div style={{overflowX:"auto"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
-            <thead><tr style={{borderBottom:"2px solid "+C.red}}>
-              {["Vecka","Torsdag em/kväll","Fredag em/kväll","Lördag fm","Anteckningar"].map(h=>(
-                <th key={h} style={{textAlign:"left",padding:"6px 8px",fontWeight:700,fontSize:9,textTransform:"uppercase",letterSpacing:"0.04em"}}>{h}</th>
-              ))}
-            </tr></thead>
-            <tbody>
-              {DEMO_SCHEDULE.map(d=>{
-                const s1=STORES.find(s=>s.id===d.store1);
-                const s2=STORES.find(s=>s.id===d.store2);
-                const s3=STORES.find(s=>s.id===d.store3);
-                const prioColor=(p)=>p===1?C.red:p===2?C.navy:"#888";
-                return(
-                  <tr key={d.week} style={{borderBottom:"1px solid #E8E2DA"}}>
-                    <td style={{padding:"8px 8px",fontWeight:700,color:C.red,fontSize:13}}>v{d.week}</td>
-                    <td style={{padding:"8px 8px"}}>
-                      <span style={{fontSize:11,fontWeight:600,color:prioColor(s1?.prio)}}>{s1?.name}</span>
-                      <div style={{fontSize:9,color:"#bbb"}}>{s1?.fmt}</div>
-                    </td>
-                    <td style={{padding:"8px 8px"}}>
-                      <span style={{fontSize:11,fontWeight:600,color:prioColor(s2?.prio)}}>{s2?.name}</span>
-                      <div style={{fontSize:9,color:"#bbb"}}>{s2?.fmt}</div>
-                    </td>
-                    <td style={{padding:"8px 8px"}}>
-                      <span style={{fontSize:11,fontWeight:600,color:prioColor(s3?.prio)}}>{s3?.name}</span>
-                      <div style={{fontSize:9,color:"#bbb"}}>{s3?.fmt}</div>
-                    </td>
-                    <td style={{padding:"8px 8px"}}>
-                      <input value={demoNotes[`w${d.week}`]||""} onChange={e=>setDemoNotes(p=>({...p,[`w${d.week}`]:e.target.value}))} placeholder="..." style={{width:"100%",border:"none",background:"transparent",fontSize:11,padding:0,outline:"none"}}/>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {/* Bästa butiker ranking */}
+      <Card>
+        <Lbl>Butiker — flest sålda förpackningar totalt</Lbl>
+        <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:8}}>
+          {STORES.map(st=>{
+            const total=WEEKS.reduce((sum,w)=>{
+              if(demoNotes[`w${w}_store`]===st.id)return sum+parseInt(demoNotes[`w${w}_sold`]||0);
+              return sum;
+            },0);
+            return{store:st,total};
+          }).filter(x=>x.total>0).sort((a,b)=>b.total-a.total).map((x,i)=>(
+            <div key={x.store.id} style={{display:"flex",alignItems:"center",gap:10,padding:"6px 10px",background:C.cream,borderRadius:4}}>
+              <span style={{fontFamily:"Georgia,serif",fontWeight:700,color:C.red,minWidth:20}}>{i+1}</span>
+              <span style={{flex:1,fontSize:12,fontFamily:"system-ui",fontWeight:600}}>{x.store.name}</span>
+              <span style={{fontSize:13,fontWeight:700,color:C.dark}}>{x.total} st</span>
+            </div>
+          ))}
+          {STORES.every(st=>WEEKS.every(w=>demoNotes[`w${w}_store`]!==st.id||!demoNotes[`w${w}_sold`]))&&<div style={{fontSize:11,fontFamily:"system-ui",color:"#ccc"}}>Ingen försäljningsdata ännu.</div>}
         </div>
       </Card>
-      <Card>
+
+      <Card style={{marginTop:14}}>
         <Lbl>Demo-tips</Lbl>
         <div style={{fontFamily:"system-ui",fontSize:12,color:"#666",lineHeight:1.7,marginTop:6}}>
-          <b>Bästa dagar:</b> Torsdag, fredag och lördag. Tider: torsdag & fredag eftermiddag/kväll, lördag förmiddag. <span style={{color:"#B85042"}}>OBS: dubbelkolla detta mot faktisk butiksdata.</span><br/>
+          <b>Dagar & tider:</b> Torsdag & fredag eftermiddag/kväll, lördag förmiddag. <span style={{color:"#B85042"}}>OBS: dubbelkolla med butikerna.</span><br/>
           <b>Intro-erbjudande:</b> Oklart om detta är rätt strategi — utvärderas under piloten.<br/>
           <b>Placering:</b> Be om gondolände eller kassanära — inte inne i hyllan.<br/>
-          <b>Mätning smakprov:</b> Vi räknar själva. Enklast: ta med ett räkneblock eller använd Notes på telefonen — ett streck per utdelat prov, ett streck per köp. Räkna av vid dagens slut. Konvertering = köp / utdelade prov × 100.<br/>
-          <b>Kostnad:</b> ~3000-3500 kr/dag med extern demopersonal (Thea själv = gratis + bättre).
+          <b>Mätning:</b> Räkna smakprov och köp direkt i appen ovan. Konvertering = köp / utdelade prov × 100. Bra nivå: 15-25%.<br/>
+          <b>Kostnad:</b> ~3 000-3 500 kr/dag extern demopersonal. Thea själv = gratis + bäst.
         </div>
       </Card>
     </div>)}
 
     {/* ═══ FORECAST ═══ */}
     {tab==="forecast"&&(<div>
-      <PageHead title="Produktions- & förpackningsforecast." sub="Forecast"/>
-      <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:16}}>
-        <div style={{flex:"1 1 140px",background:C.card,borderRadius:6,padding:"10px 14px",position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.red}}/>
-          <div style={{fontSize:8,letterSpacing:"0.1em",textTransform:"uppercase",color:C.red,fontFamily:"system-ui",fontWeight:700,marginBottom:2}}>Hållbarhet</div>
-          <div style={{fontFamily:"Georgia,serif",fontSize:20,fontWeight:700,color:C.dark}}>{SHELF} dagar</div>
-        </div>
-        <div style={{flex:"1 1 140px",background:C.card,borderRadius:6,padding:"10px 14px",position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:"#B85042"}}/>
-          <div style={{fontSize:8,letterSpacing:"0.1em",textTransform:"uppercase",color:"#B85042",fontFamily:"system-ui",fontWeight:700,marginBottom:2}}>Min. hållbarhet vid leverans</div>
-          <div style={{fontFamily:"Georgia,serif",fontSize:20,fontWeight:700,color:C.dark}}>70% kvar</div>
-          <div style={{fontSize:9,color:"#999",fontFamily:"system-ui",marginTop:1}}>Max {MAX_AGE_DELIVERY}d gammal vid butiksleverans</div>
-        </div>
-        <div style={{flex:"1 1 140px",background:C.card,borderRadius:6,padding:"10px 14px",position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.navy}}/>
-          <div style={{fontSize:8,letterSpacing:"0.1em",textTransform:"uppercase",color:C.navy,fontFamily:"system-ui",fontWeight:700,marginBottom:2}}>Kolli</div>
-          <div style={{fontFamily:"Georgia,serif",fontSize:20,fontWeight:700,color:C.dark}}>{KOLLI} förp/kolli</div>
-          <div style={{fontSize:9,color:"#999",fontFamily:"system-ui",marginTop:1}}>Per sort, per kolli</div>
-        </div>
+      <PageHead title="Forecast & Lagerstatus." sub="Forecast & Lager"/>
+
+      {/* KPI-rad */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:14}}>
+        {[
+          {l:"Hållbarhet",v:`${SHELF}d`,c:C.red},
+          {l:"Min. vid leverans till butik",v:"70% kvar",s:`Max ${MAX_AGE_DELIVERY}d gammal`,c:"#B85042"},
+          {l:"Kolli",v:`${KOLLI} förp/kolli`,c:C.navy},
+          {l:"Ledtid Konditoriet",v:`${bakeryInfo.leadtime||7}d`,c:C.green},
+          {l:"Ledtid Kartongbolaget",v:`${pkgInfo.leadtime||14}d`,c:"#888"},
+        ].map((x,i)=>(
+          <div key={i} style={{flex:"1 1 120px",background:C.card,borderRadius:6,padding:"10px 14px",position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:x.c}}/>
+            <div style={{fontSize:8,letterSpacing:"0.1em",textTransform:"uppercase",color:x.c,fontFamily:"system-ui",fontWeight:700,marginBottom:2}}>{x.l}</div>
+            <div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700,color:C.dark}}>{x.v}</div>
+            {x.s&&<div style={{fontSize:9,color:"#999",fontFamily:"system-ui"}}>{x.s}</div>}
+          </div>
+        ))}
       </div>
-      <Card style={{marginBottom:16}}>
-        <Lbl>Beställning till producent</Lbl>
-        <div style={{fontFamily:"Georgia,serif",fontSize:16,fontWeight:700,margin:"4px 0 12px"}}>Hur mycket ska jag beställa?</div>
-        <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
-          <thead><tr style={{borderBottom:"2px solid "+C.red}}>
-            {["SKU","Snitt/v","Lager","Vkr kvar","Best. 6v","Kolli","Kg 150g","Kg 400g"].map(h=><th key={h} style={{textAlign:"left",padding:"6px 6px",fontWeight:700,fontSize:9,textTransform:"uppercase",letterSpacing:"0.03em"}}>{h}</th>)}
-          </tr></thead>
-          <tbody>{SKUS.map(sk=>{const avg=m.fcAvg[sk.id]||0;const stk=fc[`s-${sk.id}`]||0;const wl=avg>0?(stk/avg).toFixed(1):"—";const oq=avg*6;return(
-            <tr key={sk.id} style={{borderBottom:"1px solid #E8E2DA"}}>
-              <td style={{padding:"6px",fontWeight:600}}>{sk.name}</td>
-              <td style={{padding:"6px"}}>{avg}</td>
-              <td style={{padding:"6px"}}><input type="number" min="0" value={stk||""} placeholder="0" onChange={e=>setFc(p=>({...p,[`s-${sk.id}`]:parseInt(e.target.value)||0}))} style={{width:55,padding:"3px 5px",borderRadius:3,border:"1px solid "+C.border,fontSize:11,textAlign:"center"}}/></td>
-              <td style={{padding:"6px",color:parseFloat(wl)<2?C.red:C.dark,fontWeight:parseFloat(wl)<2?700:400}}>{wl}</td>
-              <td style={{padding:"6px",fontWeight:700,color:C.red}}>{oq>0?oq:"—"}</td>
-              <td style={{padding:"6px"}}>{oq>0?Math.ceil(oq/KOLLI):"—"}</td>
-              <td style={{padding:"6px",color:"#888"}}>{oq>0?(oq*0.15).toFixed(1):"—"}</td>
-              <td style={{padding:"6px",color:"#888"}}>{oq>0?(oq*0.4).toFixed(1):"—"}</td>
-            </tr>)})}</tbody>
-        </table></div>
-        <div style={{marginTop:12,padding:10,background:C.cream,borderRadius:5,fontSize:11,fontFamily:"system-ui",color:"#666"}}>
-          <b>Total kg till producent (6v supply):</b> 150g: {(SKUS.reduce((s,sk)=>(m.fcAvg[sk.id]||0)*6,0)*0.15).toFixed(1)} kg · 400g: {(SKUS.reduce((s,sk)=>(m.fcAvg[sk.id]||0)*6,0)*0.4).toFixed(1)} kg
-          <br/><b>Total förpackningar:</b> 150g: {SKUS.reduce((s,sk)=>(m.fcAvg[sk.id]||0)*6,0)} st · 400g: {SKUS.reduce((s,sk)=>(m.fcAvg[sk.id]||0)*6,0)} st · Kolli: {Math.ceil(SKUS.reduce((s,sk)=>(m.fcAvg[sk.id]||0)*6,0)/KOLLI*2)} st
+
+      {/* Leveranskedja-kalkylator */}
+      <Card style={{marginBottom:14}}>
+        <Lbl>Leveranskedja & due dates</Lbl>
+        <p style={{fontFamily:"system-ui",fontSize:11,color:"#aaa",margin:"4px 0 10px"}}>Ange produktionsdatum → appen beräknar alla due dates automatiskt.</p>
+        <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"flex-end",marginBottom:10}}>
+          <Inp label="Produktionsdatum (Konditoriet klart)" type="date" value={fc.shelfDate||""} onChange={v=>setFc(p=>({...p,shelfDate:v}))}/>
+          <Inp label="Batch-nr / referens" value={fc.batchNr||""} onChange={v=>setFc(p=>({...p,batchNr:v}))}/>
+        </div>
+        {fc.shelfDate&&(()=>{
+          const prod=new Date(fc.shelfDate);
+          const lagKonditori=parseInt(fc.lagKonditori||7);
+          const lagPolfarskt=parseInt(fc.lagPolfarskt||14);
+          const expiry=new Date(prod.getTime()+SHELF*864e5);
+          const latestToLogistik=new Date(prod.getTime()+(SHELF-lagPolfarskt-7)*864e5);
+          const latestToButik=new Date(prod.getTime()+MAX_AGE_DELIVERY*864e5);
+          const skickFranKonditori=new Date(prod.getTime()+lagKonditori*864e5);
+          const fmt=d=>d.toISOString().slice(0,10);
+          const today=new Date();
+          const daysToExpiry=Math.ceil((expiry-today)/864e5);
+          return(
+            <div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:8,marginBottom:10}}>
+                {[
+                  {step:"1",label:"Produktionsklar",date:fmt(prod),color:C.navy,desc:"Konditoriet klart"},
+                  {step:"2",label:"Skicka från konditoriet",date:fmt(skickFranKonditori),color:C.navy,desc:`+${lagKonditori}d lager hos konditoriet`},
+                  {step:"3",label:"Senast till Polfärskt",date:fmt(latestToLogistik),color:"#B85042",desc:`Polfärskt behöver ${lagPolfarskt}d hantering`},
+                  {step:"4",label:"Senast i butik",date:fmt(latestToButik),color:C.red,desc:"70% hållbarhet kvar"},
+                  {step:"5",label:"Utgångsdatum",date:fmt(expiry),color:"#888",desc:`${daysToExpiry}d kvar idag`},
+                ].map(s=>(
+                  <div key={s.step} style={{background:C.cream,borderRadius:5,padding:"10px 12px",borderLeft:"3px solid "+s.color}}>
+                    <div style={{fontSize:9,fontFamily:"system-ui",fontWeight:700,color:s.color,textTransform:"uppercase",marginBottom:2}}>Steg {s.step}</div>
+                    <div style={{fontSize:11,fontFamily:"system-ui",fontWeight:700,marginBottom:2}}>{s.label}</div>
+                    <div style={{fontFamily:"Georgia,serif",fontSize:14,fontWeight:700,color:s.color}}>{s.date}</div>
+                    <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui"}}>{s.desc}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                <div style={{flex:"1 1 120px"}}>
+                  <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui",fontWeight:700,marginBottom:3}}>Lager hos konditoriet (dagar)</div>
+                  <input type="number" value={fc.lagKonditori||7} onChange={e=>setFc(p=>({...p,lagKonditori:e.target.value}))} style={{width:60,padding:"5px 8px",borderRadius:4,border:"1px solid "+C.border,fontSize:12}}/>
+                </div>
+                <div style={{flex:"1 1 120px"}}>
+                  <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui",fontWeight:700,marginBottom:3}}>Polfärskt hanteringstid (dagar)</div>
+                  <input type="number" value={fc.lagPolfarskt||14} onChange={e=>setFc(p=>({...p,lagPolfarskt:e.target.value}))} style={{width:60,padding:"5px 8px",borderRadius:4,border:"1px solid "+C.border,fontSize:12}}/>
+                </div>
+                <div style={{flex:1,alignSelf:"flex-end"}}>
+                  <ShelfTag prodDate={fc.shelfDate}/>
+                  {fc.batchNr&&<span style={{marginLeft:8,fontSize:10,fontFamily:"system-ui",color:"#888"}}>Batch: <b>{fc.batchNr}</b></span>}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+      </Card>
+
+      {/* Lagerstatus */}
+      <Card style={{marginBottom:14}}>
+        <Lbl>Lagerstatus — 150g förpackningar hos Konditoriet</Lbl>
+        <p style={{fontFamily:"system-ui",fontSize:11,color:"#aaa",margin:"4px 0 10px"}}>Förpackningsmaterial skickat från Kartongbolaget → mottagit hos Konditoriet. Uppdatera manuellt.</p>
+        <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+          {SKUS.map(sk=>{
+            const forpSent=parseInt(inventory.forpLager?.[`sent_${sk.id}`]||0);
+            const forpLeft=parseInt(inventory.forpLager?.[`left_${sk.id}`]||0);
+            const kakLager=parseInt(inventory.kakLager?.[sk.id]||0);
+            const lowForp=forpLeft<200;
+            const lowKak=kakLager<400;
+            return(
+              <div key={sk.id} style={{flex:"1 1 160px",background:lowForp||lowKak?"#FFF0F0":C.cream,borderRadius:6,padding:"10px 12px",border:"1px solid "+(lowForp||lowKak?C.red:C.border)}}>
+                <div style={{fontSize:11,fontFamily:"system-ui",fontWeight:700,marginBottom:6,color:lowForp||lowKak?C.red:C.dark}}>{sk.name}</div>
+                <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui",marginBottom:2}}>Förpackningar kvar (150g)</div>
+                <input type="number" min="0" value={forpLeft||""} placeholder="0" onChange={e=>setInventory(p=>({...p,forpLager:{...p.forpLager,[`left_${sk.id}`]:e.target.value}}))} style={{width:"100%",padding:"4px 6px",borderRadius:3,border:"1px solid "+(lowForp?C.red:C.border),fontSize:12,fontWeight:700,textAlign:"center",color:lowForp?C.red:C.dark,marginBottom:4}}/>
+                <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui",marginBottom:2}}>Kakor lager (förp á 150g)</div>
+                <input type="number" min="0" value={kakLager||""} placeholder="0" onChange={e=>setInventory(p=>({...p,kakLager:{...p.kakLager,[sk.id]:e.target.value}}))} style={{width:"100%",padding:"4px 6px",borderRadius:3,border:"1px solid "+(lowKak?C.red:C.border),fontSize:12,fontWeight:700,textAlign:"center",color:lowKak?C.red:C.dark}}/>
+                {(lowForp||lowKak)&&<div style={{marginTop:4,fontSize:9,color:C.red,fontFamily:"system-ui",fontWeight:700}}>⚠ Lågt lager</div>}
+              </div>
+            );
+          })}
         </div>
       </Card>
+
+      {/* Beställningsrekommendation */}
       <Card>
-        <Lbl>Hållbarhetskalkylator</Lbl>
-        <div style={{display:"flex",gap:12,alignItems:"flex-end",flexWrap:"wrap",marginTop:6}}>
-          <Inp label="Produktionsdatum" type="date" value={fc.shelfDate||""} onChange={v=>setFc(p=>({...p,shelfDate:v}))}/>
-          {fc.shelfDate&&<div style={{fontFamily:"system-ui",fontSize:12,lineHeight:1.6}}>
-            <ShelfTag prodDate={fc.shelfDate}/>
-            <div style={{marginTop:4,fontSize:10,color:"#888"}}>Senast i butik: <b>{new Date(new Date(fc.shelfDate).getTime()+MAX_AGE_DELIVERY*864e5).toISOString().slice(0,10)}</b> · Utgår: <b>{new Date(new Date(fc.shelfDate).getTime()+SHELF*864e5).toISOString().slice(0,10)}</b></div>
-          </div>}
-        </div>
+        <Lbl>Beställningsrekommendation — 150g & 400g</Lbl>
+        <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
+          <thead><tr style={{borderBottom:"2px solid "+C.red}}>
+            {["SKU","Snitt/v","Kak-lager","Veckor kvar","Best. 6v (150g)","Best. 6v (400g)","Kolli 150g","Kolli 400g"].map(h=><th key={h} style={{textAlign:"left",padding:"6px 6px",fontWeight:700,fontSize:9,textTransform:"uppercase"}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{SKUS.map(sk=>{
+            const avg=m.fcAvg[sk.id]||0;
+            const kakLager=parseInt(inventory.kakLager?.[sk.id]||0);
+            const wl=avg>0?(kakLager/avg).toFixed(1):"—";
+            const oq150=Math.max(400,avg*6);
+            const oq400=Math.max(100,Math.ceil(avg*0.3*6));
+            return(
+              <tr key={sk.id} style={{borderBottom:"1px solid #E8E2DA",background:parseFloat(wl)<2&&wl!=="—"?"#FFF0F0":"transparent"}}>
+                <td style={{padding:"6px",fontWeight:600}}>{sk.name}</td>
+                <td style={{padding:"6px"}}>{avg}</td>
+                <td style={{padding:"6px",fontWeight:700,color:parseFloat(wl)<2?C.red:C.dark}}>{kakLager}</td>
+                <td style={{padding:"6px",color:parseFloat(wl)<2?C.red:C.dark,fontWeight:parseFloat(wl)<2?700:400}}>{wl}</td>
+                <td style={{padding:"6px",fontWeight:700,color:C.red}}>{oq150>0?oq150:"—"}</td>
+                <td style={{padding:"6px",fontWeight:700,color:C.navy}}>{oq400>0?oq400:"—"}</td>
+                <td style={{padding:"6px",color:"#888"}}>{Math.ceil(oq150/KOLLI)}</td>
+                <td style={{padding:"6px",color:"#888"}}>{Math.ceil(oq400/KOLLI)}</td>
+              </tr>);
+          })}</tbody>
+        </table></div>
       </Card>
     </div>)}
 
@@ -653,37 +837,74 @@ export default function App(){
 
     {/* ═══ SÄLJ & PROMO ═══ */}
     {tab==="promo"&&(<div>
-      <PageHead title="Sälj & promotion — centralt listad." sub="Kampanjplanering"/>
-      <p style={{fontFamily:"system-ui",fontSize:12,color:C.muted,margin:"0 0 16px",lineHeight:1.6}}>
-        Kampanjfönster: ICA kräver 12 veckor före kampanjstart. Coop/Axfood 8-10 veckor. Budget: 10% av NSV till trade marketing.
+      <PageHead title="Sälj & Promo & Kampanjer." sub="Sälj & Promo & Kampanjer"/>
+      <p style={{fontFamily:"system-ui",fontSize:12,color:C.muted,margin:"0 0 14px",lineHeight:1.6}}>
+        Planera kampanjer, sätt due dates och följ upp resultat. ICA kräver 12 veckor ledtid. Budget: 10% av NSV.
       </p>
-      <Btn onClick={()=>{setPromos(p=>[...p,{id:`K-${String(p.length+1).padStart(2,"0")}`,name:"",chain:"ICA",type:"Intro",start:"",end:"",budget:"",status:"Planerad",notes:""}])}} style={{marginBottom:16}}>+ Ny kampanj</Btn>
-      {promos.length>0&&<Card style={{overflowX:"auto",marginBottom:16}}>
+
+      {/* Kampanjplanering */}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+        <Lbl>Kampanjplanering</Lbl>
+        <Btn onClick={()=>setPromos(p=>[...p,{id:`K-${String(p.length+1).padStart(2,"0")}`,name:"",chain:"ICA",type:"Intro",start:"",end:"",deadline:"",budget:"",result:"",hitrate:"",status:"Planerad",notes:""}])}>+ Ny kampanj</Btn>
+      </div>
+
+      {promos.length>0&&<Card style={{overflowX:"auto",marginBottom:14}}>
         <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
           <thead><tr style={{borderBottom:"2px solid "+C.red}}>
-            {["ID","Kampanj","Kedja","Typ","Start","Slut","Budget","Status","Ant."].map(h=><th key={h} style={{textAlign:"left",padding:"6px 5px",fontWeight:700,fontSize:9,textTransform:"uppercase"}}>{h}</th>)}
+            {["ID","Kampanjnamn","Kedja","Typ","Due date →","Start","Slut","Budget (kr)","Utfall (kr)","Hitrate %","Status","Ant.",""].map(h=>(
+              <th key={h} style={{textAlign:"left",padding:"6px 5px",fontWeight:700,fontSize:9,textTransform:"uppercase",whiteSpace:"nowrap"}}>{h}</th>
+            ))}
           </tr></thead>
-          <tbody>{promos.map((p,i)=>(<tr key={i} style={{borderBottom:"1px solid #E8E2DA"}}>
-            <td style={{padding:"5px"}}>{p.id}</td>
-            <td style={{padding:"5px"}}><input value={p.name} onChange={e=>{const u=[...promos];u[i]={...u[i],name:e.target.value};setPromos(u)}} style={{border:"none",background:"transparent",fontSize:11,width:"100%"}} placeholder="Namn..."/></td>
-            <td style={{padding:"5px"}}><select value={p.chain} onChange={e=>{const u=[...promos];u[i]={...u[i],chain:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px"}}>{["ICA","Coop","Axfood","Alla"].map(c=><option key={c}>{c}</option>)}</select></td>
-            <td style={{padding:"5px"}}><select value={p.type} onChange={e=>{const u=[...promos];u[i]={...u[i],type:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px"}}>{["Intro","Prisnedsatt","Demo","Gondolände","Annons","TPR"].map(t=><option key={t}>{t}</option>)}</select></td>
-            <td style={{padding:"5px"}}><input type="date" value={p.start} onChange={e=>{const u=[...promos];u[i]={...u[i],start:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px"}}/></td>
-            <td style={{padding:"5px"}}><input type="date" value={p.end} onChange={e=>{const u=[...promos];u[i]={...u[i],end:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px"}}/></td>
-            <td style={{padding:"5px"}}><input type="number" value={p.budget} onChange={e=>{const u=[...promos];u[i]={...u[i],budget:e.target.value};setPromos(u)}} placeholder="kr" style={{width:60,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px"}}/></td>
-            <td style={{padding:"5px"}}><select value={p.status} onChange={e=>{const u=[...promos];u[i]={...u[i],status:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px"}}>{["Planerad","Ansökt","Godkänd","Aktiv","Klar"].map(s=><option key={s}>{s}</option>)}</select></td>
-            <td style={{padding:"5px"}}><input value={p.notes} onChange={e=>{const u=[...promos];u[i]={...u[i],notes:e.target.value};setPromos(u)}} style={{border:"none",background:"transparent",fontSize:10,width:"100%"}} placeholder="..."/></td>
-          </tr>))}</tbody>
+          <tbody>{promos.map((p,i)=>{
+            const today=new Date().toISOString().slice(0,10);
+            const isOverdue=p.deadline&&p.deadline<today&&p.status!=="Klar"&&p.status!=="Aktiv";
+            return(<tr key={i} style={{borderBottom:"1px solid #E8E2DA",background:isOverdue?"#FFF0F0":"transparent"}}>
+              <td style={{padding:"5px",fontWeight:700,color:C.red,fontSize:10}}>{p.id}</td>
+              <td style={{padding:"5px",minWidth:120}}><input value={p.name} onChange={e=>{const u=[...promos];u[i]={...u[i],name:e.target.value};setPromos(u)}} style={{border:"none",background:"transparent",fontSize:11,width:"100%",fontWeight:600}} placeholder="Kampanjnamn..."/></td>
+              <td style={{padding:"5px"}}><select value={p.chain} onChange={e=>{const u=[...promos];u[i]={...u[i],chain:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px"}}>{["ICA","Coop","Axfood","Alla"].map(c=><option key={c}>{c}</option>)}</select></td>
+              <td style={{padding:"5px"}}><select value={p.type} onChange={e=>{const u=[...promos];u[i]={...u[i],type:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px"}}>{["Intro","TPR","Demo","Gondolände","Annons","Mässor","Övrigt"].map(t=><option key={t}>{t}</option>)}</select></td>
+              <td style={{padding:"5px"}}><input type="date" value={p.deadline||""} onChange={e=>{const u=[...promos];u[i]={...u[i],deadline:e.target.value};setPromos(u)}} style={{border:"1px solid "+(isOverdue?C.red:C.border),borderRadius:3,fontSize:10,padding:"2px 4px"}}/></td>
+              <td style={{padding:"5px"}}><input type="date" value={p.start||""} onChange={e=>{const u=[...promos];u[i]={...u[i],start:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px"}}/></td>
+              <td style={{padding:"5px"}}><input type="date" value={p.end||""} onChange={e=>{const u=[...promos];u[i]={...u[i],end:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px"}}/></td>
+              <td style={{padding:"5px"}}><input type="number" value={p.budget||""} onChange={e=>{const u=[...promos];u[i]={...u[i],budget:e.target.value};setPromos(u)}} placeholder="0" style={{width:65,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"right"}}/></td>
+              <td style={{padding:"5px"}}><input type="number" value={p.result||""} onChange={e=>{const u=[...promos];u[i]={...u[i],result:e.target.value};setPromos(u)}} placeholder="—" style={{width:65,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"right",color:p.result&&+p.result>=(+p.budget||0)?C.green:C.red}}/></td>
+              <td style={{padding:"5px"}}><input value={p.hitrate||""} onChange={e=>{const u=[...promos];u[i]={...u[i],hitrate:e.target.value};setPromos(u)}} placeholder="%" style={{width:45,border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px 4px",textAlign:"center"}}/></td>
+              <td style={{padding:"5px"}}><select value={p.status} onChange={e=>{const u=[...promos];u[i]={...u[i],status:e.target.value};setPromos(u)}} style={{border:"1px solid "+C.border,borderRadius:3,fontSize:10,padding:"2px",background:p.status==="Aktiv"?"#D4EDDA":p.status==="Klar"?"#e8f5e9":p.status==="Godkänd"?"#FFF3CD":"#fff"}}>{["Planerad","Ansökt","Godkänd","Aktiv","Klar"].map(s=><option key={s}>{s}</option>)}</select></td>
+              <td style={{padding:"5px"}}><input value={p.notes||""} onChange={e=>{const u=[...promos];u[i]={...u[i],notes:e.target.value};setPromos(u)}} style={{border:"none",background:"transparent",fontSize:10,width:80}} placeholder="..."/></td>
+              <td style={{padding:"5px"}}><button onClick={()=>setPromos(p=>p.filter((_,j)=>j!==i))} style={{background:"none",border:"none",cursor:"pointer",color:"#ddd",fontSize:14}}>×</button></td>
+            </tr>);
+          })}</tbody>
         </table>
       </Card>}
+
+      {/* Kommande due dates */}
+      {promos.filter(p=>p.deadline&&p.status!=="Klar").length>0&&<Card style={{marginBottom:14}}>
+        <Lbl>Kommande due dates</Lbl>
+        <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:8}}>
+          {promos.filter(p=>p.deadline&&p.status!=="Klar").sort((a,b)=>a.deadline.localeCompare(b.deadline)).map((p,i)=>{
+            const today=new Date().toISOString().slice(0,10);
+            const daysLeft=Math.ceil((new Date(p.deadline)-new Date(today))/864e5);
+            const urgent=daysLeft<=7;
+            return(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 10px",background:urgent?"#FFF0F0":C.cream,borderRadius:4,borderLeft:"3px solid "+(urgent?C.red:"#bbb")}}>
+                <span style={{fontFamily:"Georgia,serif",fontWeight:700,fontSize:13,color:urgent?C.red:"#888",minWidth:45}}>{daysLeft}d</span>
+                <span style={{flex:1,fontSize:12,fontFamily:"system-ui",fontWeight:600}}>{p.name||p.id}</span>
+                <Badge bg={p.chain==="ICA"?C.red:p.chain==="Coop"?"#5B4A9E":C.navy}>{p.chain}</Badge>
+                <span style={{fontSize:10,fontFamily:"system-ui",color:"#999"}}>{p.deadline}</span>
+              </div>
+            );
+          })}
+        </div>
+      </Card>}
+
       <Card>
-        <Lbl>Kampanjtyper vid central listning</Lbl>
+        <Lbl>Kampanjtyper & ledtider</Lbl>
         <div style={{fontFamily:"system-ui",fontSize:12,color:"#666",lineHeight:1.8,marginTop:8}}>
-          <b>Intro-kampanj (v.7-8):</b> 10-20% rabatt vid lansering. Budget ~50-100k.<br/>
+          <b>ICA ledtid:</b> 12 veckor före kampanjstart — ansök tidigt!<br/>
+          <b>Coop/Axfood ledtid:</b> 8-10 veckor.<br/>
           <b>TPR (Temporary Price Reduction):</b> Kedjan sänker hyllpris, du ger kampanjbidrag. Vanligast.<br/>
-          <b>Gondolände/extra exponering:</b> Betala ~2-5k/vecka/butik för extra placering.<br/>
-          <b>Demo-blitz:</b> Intensiv demo i 20-50 butiker under 2 veckor. Budget ~60-100k.<br/>
-          <b>Annons:</b> ICA-kuriren, Coop-tidningen, Hemköp-appen. ~10-30k per insertion.<br/>
+          <b>Gondolände:</b> ~2-5k/vecka/butik för extra placering.<br/>
+          <b>Demo-blitz:</b> Intensiv demo 20-50 butiker under 2 veckor. Budget ~60-100k.<br/>
           <b>Budget-tumregel:</b> 10% av NSV till trade marketing. År 1 central: ~500k.
         </div>
       </Card>
@@ -691,30 +912,63 @@ export default function App(){
 
     {/* ═══ TASKS ═══ */}
     {tab==="tasks"&&(<div>
-      <PageHead title="Vägen till central listning." sub="Projekt"/>
-      <div style={{display:"flex",gap:8,marginBottom:16}}>
-        <Btn onClick={()=>setTasks(p=>[...p,{id:`T${String(p.length+1).padStart(2,"0")}`,task:"",cat:"Sälj",who:"Thea",due:"",p:2,st:"Ej påbörjad"}])}>+ Uppgift</Btn>
-        <div style={{display:"flex",gap:6,alignItems:"center",fontFamily:"system-ui",fontSize:11,color:"#999"}}>
-          <span style={{width:8,height:8,borderRadius:2,background:"#D4EDDA",display:"inline-block"}}/> Klar ({tasks.filter(t=>t.st==="Klar").length})
-          <span style={{width:8,height:8,borderRadius:2,background:"#FFF3CD",display:"inline-block"}}/> Pågår ({tasks.filter(t=>t.st==="Pågår").length})
-          <span style={{width:8,height:8,borderRadius:2,background:"#FFE0E0",display:"inline-block"}}/> Ej ({tasks.filter(t=>t.st==="Ej påbörjad").length})
+      <PageHead title="To Do." sub="To Do"/>
+      <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
+        <Btn onClick={()=>{const newTask={id:`T${Date.now()}`,task:"Ny uppgift...",cat:"Sälj",who:"Thea",due:"",p:"A",st:"Ej påbörjad"};setTasks(p=>[newTask,...p])}}>+ Uppgift</Btn>
+        <div style={{display:"flex",gap:8,fontFamily:"system-ui",fontSize:11,color:"#999"}}>
+          <span>A: {tasks.filter(t=>t.p==="A"&&t.st!=="Klar").length} st</span>
+          <span>B: {tasks.filter(t=>t.p==="B"&&t.st!=="Klar").length} st</span>
+          <span>C: {tasks.filter(t=>t.p==="C"&&t.st!=="Klar").length} st</span>
+          <span style={{color:"#aaa"}}>Klara: {tasks.filter(t=>t.st==="Klar").length}</span>
         </div>
       </div>
-      <div style={{display:"grid",gap:6}}>
-        {tasks.sort((a,b)=>{if(a.st==="Klar"&&b.st!=="Klar")return 1;if(b.st==="Klar"&&a.st!=="Klar")return-1;return a.p-b.p||(a.due||"").localeCompare(b.due||"")}).map((t,i)=>(
-          <div key={t.id} style={{background:C.card,borderRadius:5,padding:"10px 14px",display:"flex",alignItems:"center",gap:10,opacity:t.st==="Klar"?0.45:1}}>
-            <button onClick={()=>{const u=[...tasks];const idx=tasks.indexOf(t);const nx=t.st==="Ej påbörjad"?"Pågår":t.st==="Pågår"?"Klar":"Ej påbörjad";u[idx]={...t,st:nx};setTasks(u)}} style={{
-              width:22,height:22,borderRadius:3,border:"2px solid "+(t.st==="Klar"?C.green:C.red),cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,
-              background:t.st==="Klar"?C.green:t.st==="Pågår"?"#FFF3CD":"#fff",color:t.st==="Klar"?"#fff":C.red,
-            }}>{t.st==="Klar"?"✓":t.st==="Pågår"?"~":""}</button>
-            <div style={{flex:1}}>
-              <div style={{fontSize:13,fontFamily:"system-ui",fontWeight:600,textDecoration:t.st==="Klar"?"line-through":"none"}}>{t.task||<span style={{color:"#ccc"}}>Skriv uppgift...</span>}</div>
-              <div style={{fontSize:10,fontFamily:"system-ui",color:"#aaa",marginTop:1}}>{t.cat} · {t.who} · {t.due||"Inget datum"}</div>
+
+      {["A","B","C"].map(prio=>{
+        const prioCfg={A:{color:C.red,label:"A — Högsta prioritet",desc:"Måste göras nu"},B:{color:"#B85042",label:"B — Viktig",desc:"Gör snart"},C:{color:"#888",label:"C — Lägre prioritet",desc:"När tid finns"}};
+        const cfg=prioCfg[prio];
+        const prioTasks=tasks.filter(t=>t.p===prio&&t.st!=="Klar");
+        const doneTasks=tasks.filter(t=>t.p===prio&&t.st==="Klar");
+        return(
+          <div key={prio} style={{marginBottom:16}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 14px",background:cfg.color,borderRadius:"6px 6px 0 0"}}>
+              <div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700,color:"#fff"}}>{prio}</div>
+              <div>
+                <div style={{fontSize:11,fontWeight:700,color:"#fff",fontFamily:"system-ui"}}>{cfg.label}</div>
+                <div style={{fontSize:9,color:"rgba(255,255,255,0.7)",fontFamily:"system-ui"}}>{cfg.desc}</div>
+              </div>
+              <div style={{marginLeft:"auto",fontSize:10,fontFamily:"system-ui",color:"rgba(255,255,255,0.8)"}}>{prioTasks.length} aktiva</div>
+              <button onClick={()=>{const newTask={id:`T${Date.now()}`,task:"Ny uppgift...",cat:"Sälj",who:"Thea",due:"",p:prio,st:"Ej påbörjad"};setTasks(prev=>[newTask,...prev])}} style={{background:"rgba(255,255,255,0.2)",border:"none",borderRadius:4,color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer",padding:"4px 10px"}}>+</button>
             </div>
-            <Badge bg={t.p===1?C.red:t.p===2?"#B85042":"#aaa"}>P{t.p}</Badge>
+            <div style={{background:C.card,borderRadius:"0 0 6px 6px",padding:8,display:"flex",flexDirection:"column",gap:4}}>
+              {prioTasks.length===0&&<div style={{fontSize:11,fontFamily:"system-ui",color:"#ccc",padding:"8px 6px"}}>Inga uppgifter i prio {prio}.</div>}
+              {prioTasks.map((t)=>(
+                <div key={t.id} style={{background:"#fff",borderRadius:4,padding:"8px 10px",display:"flex",alignItems:"center",gap:8,border:"1px solid #E8E2DA"}}>
+                  <button onClick={()=>{const idx=tasks.findIndex(x=>x.id===t.id);const u=[...tasks];const nx=t.st==="Ej påbörjad"?"Pågår":t.st==="Pågår"?"Klar":"Ej påbörjad";u[idx]={...t,st:nx};setTasks(u)}} style={{
+                    width:20,height:20,borderRadius:3,border:"2px solid "+(t.st==="Klar"?C.green:cfg.color),cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0,
+                    background:t.st==="Klar"?C.green:t.st==="Pågår"?"#FFF3CD":"#fff",color:t.st==="Klar"?"#fff":cfg.color,
+                  }}>{t.st==="Klar"?"✓":t.st==="Pågår"?"~":""}</button>
+                  <input value={t.task} onChange={e=>{const idx=tasks.findIndex(x=>x.id===t.id);const u=[...tasks];u[idx]={...t,task:e.target.value};setTasks(u)}} style={{flex:1,border:"none",fontSize:12,fontFamily:"system-ui",fontWeight:600,outline:"none",background:"transparent"}}/>
+                  <select value={t.cat} onChange={e=>{const idx=tasks.findIndex(x=>x.id===t.id);const u=[...tasks];u[idx]={...t,cat:e.target.value};setTasks(u)}} style={{fontSize:10,border:"1px solid #E8E2DA",borderRadius:3,padding:"2px 4px",fontFamily:"system-ui"}}>
+                    {["Sälj","Prod","Marknad","Design","Cert","Finans","Logistik","IT","Övrigt"].map(c=><option key={c}>{c}</option>)}
+                  </select>
+                  <input type="date" value={t.due||""} onChange={e=>{const idx=tasks.findIndex(x=>x.id===t.id);const u=[...tasks];u[idx]={...t,due:e.target.value};setTasks(u)}} style={{fontSize:10,border:"1px solid #E8E2DA",borderRadius:3,padding:"2px 4px"}}/>
+                  <button onClick={()=>setTasks(p=>p.filter(x=>x.id!==t.id))} style={{background:"none",border:"none",cursor:"pointer",color:"#ddd",fontSize:14,padding:"0 2px"}}>×</button>
+                </div>
+              ))}
+              {doneTasks.length>0&&<div style={{marginTop:4,paddingTop:4,borderTop:"1px dashed #E8E2DA"}}>
+                <div style={{fontSize:9,fontFamily:"system-ui",color:"#bbb",marginBottom:3}}>KLARA ({doneTasks.length})</div>
+                {doneTasks.map(t=>(
+                  <div key={t.id} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 6px",opacity:0.45}}>
+                    <button onClick={()=>{const idx=tasks.findIndex(x=>x.id===t.id);const u=[...tasks];u[idx]={...t,st:"Ej påbörjad"};setTasks(u)}} style={{width:18,height:18,borderRadius:3,border:"2px solid "+C.green,cursor:"pointer",background:C.green,color:"#fff",fontSize:10,display:"flex",alignItems:"center",justifyContent:"center"}}>✓</button>
+                    <span style={{fontSize:11,fontFamily:"system-ui",textDecoration:"line-through",color:"#aaa"}}>{t.task}</span>
+                    <button onClick={()=>setTasks(p=>p.filter(x=>x.id!==t.id))} style={{background:"none",border:"none",cursor:"pointer",color:"#ddd",fontSize:12,marginLeft:"auto"}}>×</button>
+                  </div>
+                ))}
+              </div>}
+            </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>)}
 
     {/* ═══ EDI GUIDE ═══ */}
@@ -836,7 +1090,7 @@ export default function App(){
         <div style={{display:"grid",gap:6,marginTop:8,fontFamily:"system-ui",fontSize:12}}>
           {[
             ["Kategorins storlek","1,5-2,5 mdr kr","Nielsen"],
-            ["Enda svenskproducerade kakan","Theas Torteria","Unik position"],
+            ["Svensk hantverkstradition","Recept & process sedan 1950-tal","Autenticitet"],
             ["Clean label: 6 ingredienser","vs 15-24 hos konkurrenter","Konsumenttrend"],
             ["Äkta Vara + Från Sverige","Certifiering pågår","Trovärdighet"],
             ["Hållbarhet 90d, ingen kylkedja","Låg logistikkostnad","Operativt"],
@@ -873,51 +1127,113 @@ export default function App(){
 
     {/* ═══ PROVFÖRSÄLJNING 2026 ═══ */}
     {tab==="pilot"&&(<div>
-      <PageHead title="Provförsäljning 2026." sub="Pilot"/>
-      <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:24}}>
-        <div style={{flex:"1 1 160px",minWidth:150,background:C.card,borderRadius:6,padding:"16px 18px",position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.red}}/>
-          <div style={{fontSize:10,letterSpacing:"0.11em",textTransform:"uppercase",color:C.red,marginBottom:4,fontFamily:"system-ui",fontWeight:700}}>Period</div>
-          <div style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:700,color:C.dark,lineHeight:1.2}}>16 veckor</div>
-          <div style={{fontSize:11,color:"#999",marginTop:2,fontFamily:"system-ui"}}>Göteborg</div>
-        </div>
-        <div style={{flex:"1 1 160px",minWidth:150,background:C.card,borderRadius:6,padding:"16px 18px",position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.red}}/>
-          <div style={{fontSize:10,letterSpacing:"0.11em",textTransform:"uppercase",color:C.red,marginBottom:4,fontFamily:"system-ui",fontWeight:700}}>Butiker</div>
-          <div style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:700,color:C.dark,lineHeight:1.2}}>10 st</div>
-          <div style={{fontSize:11,color:"#999",marginTop:2,fontFamily:"system-ui"}}>ICA + Axfood</div>
-        </div>
-        <div style={{flex:"1 1 160px",minWidth:150,background:C.card,borderRadius:6,padding:"16px 18px",position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.red}}/>
-          <div style={{fontSize:10,letterSpacing:"0.11em",textTransform:"uppercase",color:C.red,marginBottom:4,fontFamily:"system-ui",fontWeight:700}}>SKU:er</div>
-          <div style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:700,color:C.dark,lineHeight:1.2}}>7 sorter</div>
-          <div style={{fontSize:11,color:"#999",marginTop:2,fontFamily:"system-ui"}}>150g · DVH</div>
-        </div>
-        <div style={{flex:"1 1 160px",minWidth:150,background:C.card,borderRadius:6,padding:"16px 18px",position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.red}}/>
-          <div style={{fontSize:10,letterSpacing:"0.11em",textTransform:"uppercase",color:C.red,marginBottom:4,fontFamily:"system-ui",fontWeight:700}}>Mål presentation</div>
-          <div style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:700,color:C.dark,lineHeight:1.2}}>Okt 2026</div>
-          <div style={{fontSize:11,color:"#999",marginTop:2,fontFamily:"system-ui"}}>ICA · Coop · Axfood</div>
-        </div>
+      <PageHead title="Provförsäljning 2026." sub="Pilot — 12 veckor"/>
+
+      {/* KPI-kort */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:14}}>
+        {[
+          {l:"Period",v:"12 veckor",s:"Göteborg"},
+          {l:"Butiker",v:"13 st",s:"ICA + Axfood"},
+          {l:"SKU:er",v:"7 sorter",s:"150g · DVH"},
+          {l:"Mål presentation",v:"Okt 2026",s:"ICA · Coop · Axfood"},
+          {l:"Aktuell UPW",v:m.dvh.upw.toFixed(1),s:m.dvh.upw>=7?"✓ Över mål":"Mål: 7",accent:m.dvh.upw>=7?C.green:C.red},
+          {l:"Total pilot-försäljning",v:fmt(m.dvh.tot)+" st",s:fk(m.dvh.nsv)},
+        ].map((x,i)=><KpiCard key={i} label={x.l} value={x.v} sub={x.s} accent={x.accent||C.red}/>)}
       </div>
+
+      {/* Löpande SKU-data */}
       <Card style={{marginBottom:14}}>
-        <Lbl>Kedjor i piloten</Lbl>
-        <div style={{display:"grid",gap:6,marginTop:8}}>
-          {STORES.map(s=>(<div key={s.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",background:C.cream,borderRadius:5,fontFamily:"system-ui",fontSize:12}}>
-            <Badge bg={s.chain==="ICA"?C.red:C.navy}>{s.chain}</Badge>
-            <span style={{fontWeight:600}}>{s.name}</span>
-            <span style={{color:"#bbb",fontSize:10,marginLeft:"auto"}}>{s.fmt} · Grupp {s.group}</span>
-          </div>))}
+        <Lbl>Löpande SKU-prestanda — pilot</Lbl>
+        <div style={{overflowX:"auto",marginTop:8}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,fontFamily:"system-ui"}}>
+            <thead><tr style={{borderBottom:"2px solid "+C.red}}>
+              {["SKU","Tot. DVH","Tot. B2B","Totalt","Andel %","UPW (dvh)","Status"].map(h=>(
+                <th key={h} style={{textAlign:"left",padding:"6px 8px",fontWeight:700,fontSize:9,textTransform:"uppercase"}}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {SKUS.slice().sort((a,b)=>(m.combo[b.id]||0)-(m.combo[a.id]||0)).map(sk=>{
+                const dvh=m.dvh.sku[sk.id]||0;
+                const b2b=m.b2b.sku[sk.id]||0;
+                const tot=m.combo[sk.id]||0;
+                const share=m.totU>0?Math.round(tot/m.totU*100):0;
+                const upw=m.dvh.aw>0&&STORES.length>0?(dvh/(m.dvh.aw*STORES.length)).toFixed(1):0;
+                const strong=parseFloat(upw)>=7;
+                return(
+                  <tr key={sk.id} style={{borderBottom:"1px solid #E8E2DA"}}>
+                    <td style={{padding:"7px 8px",fontWeight:600}}>{sk.name}</td>
+                    <td style={{padding:"7px 8px"}}>{fmt(dvh)}</td>
+                    <td style={{padding:"7px 8px",color:C.navy}}>{fmt(b2b)}</td>
+                    <td style={{padding:"7px 8px",fontWeight:700}}>{fmt(tot)}</td>
+                    <td style={{padding:"7px 8px"}}>{share}%</td>
+                    <td style={{padding:"7px 8px",fontWeight:700,color:strong?C.green:C.red}}>{upw}</td>
+                    <td style={{padding:"7px 8px"}}>
+                      <span style={{fontSize:10,padding:"2px 7px",borderRadius:10,background:strong?"#D4EDDA":parseFloat(upw)>=4?"#FFF3CD":"#FFE0E0",fontWeight:600,color:strong?"#155724":parseFloat(upw)>=4?"#856404":"#721C24"}}>
+                        {strong?"Stark":parseFloat(upw)>=4?"OK":"Svag"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div style={{marginTop:10,padding:"8px 12px",background:C.cream,borderRadius:5,fontSize:11,fontFamily:"system-ui",color:"#666"}}>
+          <b>UPW-mål för kedjepresentation: 7+</b> — SKU:er under 4 bör utvärderas innan central listning.
         </div>
       </Card>
+
+      {/* Butiker */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:14}}>
+        <Card>
+          <Lbl>13 butiker i piloten</Lbl>
+          <div style={{display:"grid",gap:4,marginTop:8}}>
+            {STORES.map(s=>{
+              const total=m.dvh.store[s.id]||0;
+              const prioColor=s.prio===1?C.red:s.prio===2?C.navy:"#888";
+              return(<div key={s.id} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:C.cream,borderRadius:4}}>
+                <div style={{width:6,height:6,borderRadius:"50%",background:prioColor,flexShrink:0}}/>
+                <span style={{flex:1,fontSize:11,fontFamily:"system-ui"}}>{s.name}</span>
+                <span style={{fontSize:10,color:"#bbb"}}>{s.fmt}</span>
+                {total>0&&<span style={{fontWeight:700,color:C.red,fontSize:11}}>{fmt(total)}</span>}
+              </div>);
+            })}
+          </div>
+        </Card>
+        <Card>
+          <Lbl>7 SKU:er</Lbl>
+          <div style={{display:"grid",gap:4,marginTop:8}}>
+            {SKUS.map((s,i)=>{
+              const tot=m.combo[s.id]||0;
+              return(<div key={s.id} style={{display:"flex",alignItems:"center",gap:10,padding:"6px 10px",background:C.cream,borderRadius:4}}>
+                <span style={{color:C.red,fontWeight:700,fontSize:13,fontFamily:"Georgia,serif",minWidth:18}}>{i+1}</span>
+                <span style={{flex:1,fontSize:11,fontFamily:"system-ui",fontWeight:600}}>{s.name}</span>
+                <span style={{fontSize:10,color:"#bbb"}}>150g · 69 kr</span>
+                {tot>0&&<span style={{fontWeight:700,color:C.navy,fontSize:11}}>{fmt(tot)} st</span>}
+              </div>);
+            })}
+          </div>
+        </Card>
+      </div>
+
+      {/* Mål för kedjepresentation */}
       <Card>
-        <Lbl>7 SKU:er</Lbl>
-        <div style={{display:"grid",gap:6,marginTop:8}}>
-          {SKUS.map((s,i)=>(<div key={s.id} style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px",background:C.cream,borderRadius:5,fontFamily:"system-ui",fontSize:12}}>
-            <span style={{color:C.red,fontWeight:700,fontSize:14,fontFamily:"Georgia,serif"}}>{i+1}</span>
-            <span style={{fontWeight:600}}>{s.name}</span>
-            <span style={{color:"#bbb",fontSize:10,marginLeft:"auto"}}>150g · 69 kr</span>
-          </div>))}
+        <Lbl>Vad behöver vi visa i oktober?</Lbl>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:8,fontFamily:"system-ui",fontSize:12}}>
+          {[
+            {label:"UPW ≥ 7",done:m.dvh.upw>=7,current:`${m.dvh.upw.toFixed(1)} nu`},
+            {label:"Positiv V/V-tillväxt",done:m.dvh.avgGr>0,current:m.dvh.aw>1?fp(m.dvh.avgGr):"Ej nog data"},
+            {label:"Minst 3 starka SKU:er (UPW≥7)",done:SKUS.filter(sk=>{const upw=m.dvh.aw>0?((m.dvh.sku[sk.id]||0)/(m.dvh.aw*STORES.length)):0;return upw>=7;}).length>=3,current:`${SKUS.filter(sk=>{const upw=m.dvh.aw>0?((m.dvh.sku[sk.id]||0)/(m.dvh.aw*STORES.length)):0;return upw>=7;}).length} st nu`},
+            {label:"Positiv bruttomarginal",done:m.totG>0,current:fk(m.totG)},
+          ].map((x,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",background:x.done?"#D4EDDA":"#FFF0F0",borderRadius:5}}>
+              <span style={{fontSize:16}}>{x.done?"✓":"○"}</span>
+              <div>
+                <div style={{fontWeight:600,color:x.done?C.green:C.red}}>{x.label}</div>
+                <div style={{fontSize:10,color:"#888"}}>{x.current}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </Card>
     </div>)}
@@ -971,6 +1287,10 @@ export default function App(){
       <Card>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
           <Lbl>Produktionsordrar till Konditori Katarina</Lbl>
+          <Btn ghost onClick={()=>{
+            const mailText=`Till: ${bakeryInfo.email||"[epost konditoriet]"}\nÄmne: Produktionsorder Theas Torteria\n\nHej ${bakeryInfo.contact||""}!\n\nVi önskar beställa följande för nästa produktion:\n\n${SKUS.map(sk=>{const avg=m.fcAvg[sk.id]||0;const qty=Math.max(bakeryInfo.moq||100,Math.ceil(avg*(Math.ceil((bakeryInfo.leadtime||7)/7)+3)));return `${sk.name}: ${qty} st (${(qty*0.15).toFixed(1)} kg)`;}).join("\n")}\n\nTotal ca: ${(SKUS.reduce((s,sk)=>s+Math.max(bakeryInfo.moq||100,Math.ceil((m.fcAvg[sk.id]||0)*(Math.ceil((bakeryInfo.leadtime||7)/7)+3))),0)*0.15).toFixed(1)} kg\n\nLedtid: ${bakeryInfo.leadtime||7} dagar\nLevereras till: [adress]\n\nMvh,\nThea Arcari\nTheas Torteria`;
+            navigator.clipboard.writeText(mailText).then(()=>alert("Mail kopierat till urklipp!")).catch(()=>alert(mailText));
+          }}>📧 Generera mail</Btn>
           <Btn onClick={()=>setBakeryOrders(p=>[{
             id:`BAK-${String(p.length+1).padStart(3,"0")}`,
             orderDate:new Date().toISOString().slice(0,10),
@@ -1068,6 +1388,10 @@ export default function App(){
       <Card>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
           <Lbl>Förpackningsordrar</Lbl>
+          <Btn ghost onClick={()=>{
+            const mailText=`Till: ${pkgInfo.email||"[epost kartongbolaget]"}\nÄmne: Förpackningsorder Theas Torteria\n\nHej ${pkgInfo.contact||""}!\n\nVi önskar beställa förpackningsmaterial:\n\n150g förpackningar:\n${SKUS.map(sk=>{const qty=Math.max(pkgInfo.moq_150||500,Math.ceil((m.fcAvg[sk.id]||0)*(Math.ceil((pkgInfo.leadtime||14)/7)+4)));return `${sk.name}: ${qty} st`;}).join("\n")}\n\n400g förpackningar:\n${SKUS.map(sk=>{const qty=Math.max(pkgInfo.moq_400||250,Math.ceil((m.fcAvg[sk.id]||0)*2));return `${sk.name}: ${qty} st`;}).join("\n")}\n\nLevereras till: Konditori Katarina, Malmö\nLedtid: ${pkgInfo.leadtime||14} dagar\n\nMvh,\nThea Arcari\nTheas Torteria`;
+            navigator.clipboard.writeText(mailText).then(()=>alert("Mail kopierat till urklipp!")).catch(()=>alert(mailText));
+          }}>📧 Generera mail</Btn>
           <Btn onClick={()=>setPkgOrders(p=>[{
             id:`PKG-${String(p.length+1).padStart(3,"0")}`,
             orderDate:new Date().toISOString().slice(0,10),
@@ -1176,6 +1500,18 @@ export default function App(){
 
       return(<div>
         <PageHead title="Kapital & Försäljningsforecast." sub="Ekonomi"/>
+
+        {/* Förklaring kassaflöde */}
+        <div style={{background:"#EEF2FF",border:"1px solid #c7d2fe",borderRadius:6,padding:"12px 14px",marginBottom:14,fontFamily:"system-ui",fontSize:12}}>
+          <div style={{fontWeight:700,color:C.navy,marginBottom:6}}>💡 Vad är kassaflöde?</div>
+          <div style={{color:"#444",lineHeight:1.7}}>
+            <b>Kassaflöde</b> = pengar in minus pengar ut. Det visar om du har pengar kvar i kassan.<br/>
+            <b>Projicerat kassaflöde</b> = vad appen beräknar baserat på dina försäljningsvolymer och kostnader.<br/>
+            <b>Manuella transaktioner</b> = saker appen inte vet om: kapitalinjektioner (pengar du får in), investeringar, lån, engångskostnader.<br/>
+            <b>Exempel:</b> Om en investerare ger dig 1,5 Mkr i maj 2026 — lägg in det som "Inbetalning" för den månaden. Om du köper en förpackningsmaskin för 200k — lägg in det som "Utbetalning".<br/>
+            <b>Balansen</b> visar om du har pengar nog att driva verksamheten utan att gå minus.
+          </div>
+        </div>
 
         {/* Inställningar */}
         <Card style={{marginBottom:14}}>
@@ -1403,7 +1739,7 @@ Svara alltid på svenska. Var konkret, direkt och strategisk. Ge specifika siffr
         try{
           const resp=await fetch("https://api.anthropic.com/v1/messages",{
             method:"POST",
-            headers:{"Content-Type":"application/json"},
+            headers:{"Content-Type":"application/json","x-api-key":anthropicKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
             body:JSON.stringify({
               model:"claude-sonnet-4-20250514",
               max_tokens:1000,
@@ -1412,10 +1748,10 @@ Svara alltid på svenska. Var konkret, direkt och strategisk. Ge specifika siffr
             })
           });
           const data=await resp.json();
-          const reply=data.content?.[0]?.text||"Kunde inte hämta svar.";
-          setAiMessages(p=>[...p,{role:"assistant",content:reply}]);
+          if(data.error){setAiMessages(p=>[...p,{role:"assistant",content:`Fel: ${data.error.message}`}]);}
+          else{const reply=data.content?.[0]?.text||"Kunde inte hämta svar.";setAiMessages(p=>[...p,{role:"assistant",content:reply}]);}
         }catch(e){
-          setAiMessages(p=>[...p,{role:"assistant",content:"Fel vid anrop. Kontrollera anslutningen."}]);
+          setAiMessages(p=>[...p,{role:"assistant",content:"Fel vid anrop. Kontrollera din API-nyckel och anslutningen."}]);
         }
         setAiLoading(false);
         setTimeout(()=>{if(chatRef.current)chatRef.current.scrollTop=chatRef.current.scrollHeight},100);
@@ -1443,6 +1779,25 @@ Svara alltid på svenska. Var konkret, direkt och strategisk. Ge specifika siffr
         <p style={{fontFamily:"system-ui",fontSize:12,color:C.muted,margin:"0 0 14px",lineHeight:1.5}}>
           Claude analyserar all din försäljningsdata, ordrar och uppgifter i realtid och ger konkreta rekommendationer.
         </p>
+
+        {/* API Key setup */}
+        {!anthropicKey&&<div style={{background:"#FFF3CD",border:"1px solid #ffc107",borderRadius:6,padding:"14px 16px",marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#856404",fontFamily:"system-ui",marginBottom:6}}>🔑 API-nyckel krävs</div>
+          <div style={{fontSize:11,fontFamily:"system-ui",color:"#666",marginBottom:10,lineHeight:1.6}}>
+            För att använda AI-analysen behöver du en gratis API-nyckel från Anthropic.<br/>
+            1. Gå till <b>console.anthropic.com</b> → skapa konto<br/>
+            2. Klicka <b>API Keys</b> → <b>Create Key</b><br/>
+            3. Kopiera nyckeln (börjar med "sk-ant-...") och klistra in nedan
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            <input type="password" placeholder="sk-ant-api03-..." value={anthropicKey} onChange={e=>setAnthropicKey(e.target.value)} style={{flex:1,padding:"8px 12px",borderRadius:5,border:"1px solid #ffc107",fontSize:12,fontFamily:"system-ui"}}/>
+            <Btn onClick={()=>{if(anthropicKey.startsWith("sk-")){localStorage.setItem("tt3-anthropic-key",anthropicKey);alert("Nyckel sparad!");}else{alert("Nyckeln verkar inte stämma, kontrollera att den börjar med sk-ant-");}}} style={{whiteSpace:"nowrap"}}>Spara nyckel</Btn>
+          </div>
+        </div>}
+        {anthropicKey&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#D4EDDA",borderRadius:5,padding:"8px 12px",marginBottom:14}}>
+          <span style={{fontSize:11,fontFamily:"system-ui",color:"#155724"}}>✓ API-nyckel sparad</span>
+          <button onClick={()=>{localStorage.removeItem("tt3-anthropic-key");setAnthropicKey("");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,color:"#aaa",fontFamily:"system-ui"}}>Ta bort</button>
+        </div>}
 
         {/* Snabbfrågor */}
         <Card style={{marginBottom:14}}>
