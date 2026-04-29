@@ -38,7 +38,7 @@ const B2B_CUST = [
 ];
 const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 const SHELF = 90;
-const MIN_SHELF_PCT = 0.7;
+const MIN_SHELF_PCT = 0.75;
 const MAX_AGE_DELIVERY = Math.floor(SHELF * (1 - MIN_SHELF_PCT));
 const KOLLI = 12;
 // Prio 1: ICA Maxi Högsbo, ICA Focus, ICA Hovås — demo var 2:a vecka
@@ -365,6 +365,7 @@ export default function App(){
     {id:"edi",label:"Kedjordrar (EDI)"},
     {id:"finance",label:"Kapital & Forecast"},
     {id:"ai",label:"AI-analys"},
+    {id:"polfarskt",label:"Försäljningsstatistik"},
     {id:"ideas",label:"Idéer"},
   ];
 
@@ -752,10 +753,10 @@ export default function App(){
       <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:14}}>
         {[
           {l:"Hållbarhet",v:`${SHELF}d`,c:C.red},
-          {l:"Min. vid leverans till butik",v:"70% kvar",s:`Max ${MAX_AGE_DELIVERY}d gammal`,c:"#B85042"},
+          {l:"Min. vid leverans till butik",v:"75% kvar",s:`Max ${MAX_AGE_DELIVERY}d gammal`,c:"#B85042"},
           {l:"Kolli",v:`${KOLLI} förp/kolli`,c:C.navy},
           {l:"Ledtid Konditoriet",v:`${bakeryInfo.leadtime||7}d`,c:C.green},
-          {l:"Ledtid Polfärskt",v:"14d",c:"#888"},
+          {l:"Polfärskt enheter",v:"31 st",c:"#888"},
         ].map((x,i)=>(
           <div key={i} style={{flex:"1 1 120px",background:C.card,borderRadius:6,padding:"10px 14px",position:"relative",overflow:"hidden"}}>
             <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:x.c}}/>
@@ -1917,6 +1918,94 @@ Svara alltid på svenska. Var konkret, direkt och strategisk. Ge specifika siffr
     })()}
 
     {/* ═══ IDÉER ═══ */}
+    {/* ═══ FÖRSÄLJNINGSSTATISTIK ═══ */}
+    {tab==="polfarskt"&&(<div>
+      <PageHead title="Försäljningsstatistik." sub="Polfärskt & Marknadsdata"/>
+      <p style={{fontFamily:"system-ui",fontSize:12,color:C.muted,margin:"0 0 16px",lineHeight:1.6}}>
+        Samlad vy för försäljningsdata från Polfärskt, Nielsen och ICAs kundinsiktsprogram.
+      </p>
+
+      {/* Polfärskt */}
+      <Card style={{marginBottom:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+          <div>
+            <Lbl>Polfärskt — veckovis försäljning per butik</Lbl>
+            <p style={{fontFamily:"system-ui",fontSize:11,color:"#888",margin:"4px 0 0",lineHeight:1.5}}>
+              Polfärskt har 31 enheter och följer försäljningen på veckobasis ner på butiksnivå. Data delas löpande.
+            </p>
+          </div>
+          <div style={{background:"#D4EDDA",borderRadius:5,padding:"4px 10px",fontSize:10,fontFamily:"system-ui",fontWeight:700,color:C.green,whiteSpace:"nowrap"}}>31 enheter</div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:14}}>
+          {[
+            {l:"Totalt sålda (Polfärskt)",v:"—",s:"Uppdateras löpande"},
+            {l:"Bästa butik",v:"—",s:"Butiksnivå"},
+            {l:"Snitt/butik/vecka",v:"—",s:"Alla enheter"},
+          ].map((x,i)=>(
+            <div key={i} style={{background:C.cream,borderRadius:5,padding:"10px 14px",borderTop:"3px solid "+C.red}}>
+              <div style={{fontSize:9,fontFamily:"system-ui",fontWeight:700,color:C.red,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:3}}>{x.l}</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:22,fontWeight:700,color:C.dark}}>{x.v}</div>
+              <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui"}}>{x.s}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{background:C.cream,borderRadius:5,padding:14}}>
+          <div style={{fontSize:10,fontFamily:"system-ui",fontWeight:700,color:"#555",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Klistra in veckodata från Polfärskt</div>
+          <textarea placeholder="Klistra in försäljningsdata från Polfärskt här (t.ex. CSV eller text)..." style={{width:"100%",minHeight:100,padding:"8px 10px",borderRadius:5,border:"1px solid "+C.border,fontSize:11,fontFamily:"system-ui",resize:"vertical",boxSizing:"border-box"}}/>
+          <div style={{marginTop:8,fontSize:10,fontFamily:"system-ui",color:"#aaa"}}>Data lagras lokalt i din webbläsare. Kommande version: automatisk API-koppling till Polfärskt.</div>
+        </div>
+      </Card>
+
+      {/* Nielsen */}
+      <Card style={{marginBottom:14}}>
+        <Lbl>Nielsen — kategoridata & marknadsandelar</Lbl>
+        <p style={{fontFamily:"system-ui",fontSize:11,color:"#888",margin:"4px 0 12px",lineHeight:1.6}}>
+          Polfärskt köper Nielsen-data tillsammans med befintliga samarbetspartners. Du kan erbjudas att köpa dessa siffror — kontakta Polfärskt för offert.
+        </p>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
+          {[
+            {l:"Kategoristorlek",v:"1,5–2,5 Mdr kr",s:"Kakor & kex DVH, Nielsen"},
+            {l:"Marknadsandel Theas",v:"—",s:"Uppdateras när Nielsen köps"},
+            {l:"Kategorins tillväxt",v:"—",s:"YoY %"},
+            {l:"Top 3 konkurrenter",v:"—",s:"Marknadsandel %"},
+          ].map((x,i)=>(
+            <div key={i} style={{background:C.cream,borderRadius:5,padding:"10px 14px",borderTop:"3px solid "+C.navy}}>
+              <div style={{fontSize:9,fontFamily:"system-ui",fontWeight:700,color:C.navy,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:3}}>{x.l}</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:20,fontWeight:700,color:C.dark}}>{x.v}</div>
+              <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui"}}>{x.s}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{background:"#EEF2FF",border:"1px solid #c7d2fe",borderRadius:5,padding:"10px 14px",fontFamily:"system-ui",fontSize:11,color:"#444"}}>
+          <b style={{color:C.navy}}>Nästa steg:</b> Kontakta Polfärskt för Nielsen-offert. Nielsen-data ger dig kategorins storlek, tillväxt, konkurrenters marknadsandelar och konsumentinsikter — kritiskt för kedjepresentationen i oktober 2026.
+        </div>
+      </Card>
+
+      {/* ICA kundinsikt */}
+      <Card>
+        <Lbl>ICA Kundinsiktsprogram</Lbl>
+        <p style={{fontFamily:"system-ui",fontSize:11,color:"#888",margin:"4px 0 12px",lineHeight:1.6}}>
+          ICAs kundinsiktsprogram kan erbjudas framåt mot en kostnad. Ger detaljerad köpbeteendedata per kundprofil, lojalitet och återköpsfrekvens.
+        </p>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:12}}>
+          {[
+            {l:"Återköpsfrekvens",v:"—",s:"Hur ofta köper kunden igen?"},
+            {l:"Kundlojalitet",v:"—",s:"% som köper 2+ gånger"},
+            {l:"Snittpris/köp",v:"—",s:"Basket size"},
+          ].map((x,i)=>(
+            <div key={i} style={{background:C.cream,borderRadius:5,padding:"10px 14px",borderTop:"3px solid "+C.green}}>
+              <div style={{fontSize:9,fontFamily:"system-ui",fontWeight:700,color:C.green,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:3}}>{x.l}</div>
+              <div style={{fontFamily:"Georgia,serif",fontSize:20,fontWeight:700,color:C.dark}}>{x.v}</div>
+              <div style={{fontSize:9,color:"#aaa",fontFamily:"system-ui"}}>{x.s}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{background:"#D4EDDA",border:"1px solid #C3E6CB",borderRadius:5,padding:"10px 14px",fontFamily:"system-ui",fontSize:11,color:"#155724"}}>
+          <b>Status:</b> Kan erbjudas framåt till en kostnad via ICA. Relevant att aktivera inför eller direkt efter central listning 2027 — ger dig data för att optimera sortiment och kampanjer per kundprofil.
+        </div>
+      </Card>
+    </div>)}
+
     {tab==="ideas"&&(()=>{
       const CATS=["Alla","Produkt","Förpackning","Marknad","Distribution","Övrigt"];
       const CATCOLORS={"Produkt":C.red,"Förpackning":C.navy,"Marknad":"#2C5F2D","Distribution":"#B85042","Övrigt":"#888"};
